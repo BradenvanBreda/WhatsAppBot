@@ -46,7 +46,7 @@ def get_phone_num():
             pt.moveRel(0, -35)
             pt.tripleClick()
             sleep(0.25)
-            pt.hotkey('ctrl', 'c')
+            phone_num = pt.hotkey('ctrl', 'c')
         else:
             return
     else:
@@ -54,18 +54,14 @@ def get_phone_num():
         pt.moveTo(Number)
         pt.tripleClick()
         sleep(0.25)
-        pt.hotkey('ctrl', 'c')
+        phone_num = pt.hotkey('ctrl', 'c')
+
     Close = pt.locateCenterOnScreen("Close.png", confidence=.8)
     pt.moveTo(Close)
     pt.click()
     sleep(0.25)
     df.to_csv("auto_backup.txt", index=False)
-    check_phone_num(pyperclip.paste())
-    return
 
-def check_phone_num(phone_num):
-    global df
-    global row
     i = len(df)
     match = False
     while i > 0: #Find matching numbers
@@ -74,98 +70,31 @@ def check_phone_num(phone_num):
             row = i - 1 # used for continued screening and for session indexing
             break # only latest of interest, save time
         i = i - 1
-
     if match == True:
-        get_message()
-        new_message = pyperclip.paste().lower()
-        if str(df.iloc[row, 20]) == "1" or str(df.iloc[row, 20]) == "2": #Closed Successfully
-            if new_message == "restart" or new_message == "restart." or new_message == "restart ":
-                row = len(df)
-                New_row = {"Cell": str(phone_num),
-                           "Session": str(int(df.iloc[row, 1])+1),
-                           "Attempts": "0",
-                           "Consent": "0",
-                           "Ticket": "0",
-                           "Folder": "0",
-                           "Date": "0",
-                           "Status": "0",
-                           "Offset": "1",
-                           "8:15": "0", "9:00": "0", "9:45": "0","10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0","14:30": "0", "15:15": "0", "16:00": "0",
-                           "Appointment": "0",
-                           "Outcome": "0"}
-                df = df.append(New_row, ignore_index=True)
-                txt = open('S0_Introduction.txt', 'r')
-                temp = txt.read()
-                txt.close()
-                pyperclip.copy(temp)
-                send_message()
-                txt = open('Q1_Consent.txt', 'r')
-                temp = txt.read()
-                txt.close()
-                pyperclip.copy(temp)
-                send_message()
-            else:
-                txt = open('Restart.txt', 'r')
-                temp = txt.read()
-                txt.close()
-                pyperclip.copy(temp)
-                send_message()
-        elif str(df.iloc[row, 20]) == "3":  # Closed and Unsuccessful
-            if new_message == "restart" or new_message == "restart." or new_message == "restart ":
-                df.iloc[row, 20] = "0"
-                txt = open('S0_Introduction.txt', 'r')
-                temp = txt.read()
-                txt.close()
-                pyperclip.copy(temp)
-                send_message()
-                txt = open('Q1_Consent.txt', 'r')
-                temp = txt.read()
-                txt.close()
-                pyperclip.copy(temp)
-                send_message()
-            else:
-                txt = open('Restart.txt', 'r')
-                temp = txt.read()
-                txt.close()
-                pyperclip.copy(temp)
-                send_message()
-        elif str(df.iloc[row, 20]) == "4":  # Closed and Blocked
-            txt = open('Blocked.txt', 'r')
-            temp = txt.read()
-            txt.close()
-            pyperclip.copy(temp)
-            send_message()
-        else: # str(df.iloc[row, 20]) == "0":  #Open and in progress
-            pass
-    else: # match == False:
-        row = len(df)
-        New_row = {"Cell": str(phone_num),
-                   "Session": "0",
-                   "Attempts": "0",
-                   "Consent": "0",
-                   "Ticket": "0",
-                   "Folder": "0",
-                   "Date": "0",
-                   "Status": "0",
-                   "Offset": "1",
-                   "8:15": "0", "9:00": "0", "9:45": "0", "10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0",
-                   "14:30": "0", "15:15": "0", "16:00": "0",
-                   "Appointment": "0",
-                   "Outcome": "0"}
-        df = df.append(New_row, ignore_index=True)
-        df.iloc[row, 20] = "0"
-        txt = open('S0_Introduction.txt', 'r')
-        temp = txt.read()
-        txt.close()
-        pyperclip.copy(temp)
-        send_message()
-        txt = open('Q1_Consent.txt', 'r')
-        temp = txt.read()
-        txt.close()
-        pyperclip.copy(temp)
-        send_message()
-    df.to_csv("Patient_Log.txt", index=False)
+        return
+    else: #match == false
+        Initiate_NL(phone_num)
     return
+
+def Initiate_NL(phone_num):
+    global df
+    global row
+    New_row = {"Cell": str(phone_num),
+               "Attempts": "0",
+               "Consent": "0",
+               "Ticket": "0",
+               "Folder": "0",
+               "Date": "0",
+               "Status": "0",
+               "Offset": "1",
+               "8:15": "0", "9:00": "0", "9:45": "0", "10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0",
+               "14:30": "0", "15:15": "0", "16:00": "0",
+               "Appointment": "0",
+               "Outcome": "0"}
+    df = df.append(New_row, ignore_index=True)
+    row = len(df) - 1
+    send_message('S0_Introduction.txt')
+    send_message('Q1_Consent.txt')
 
 def store_and_ask():
     global df
@@ -175,41 +104,130 @@ def store_and_ask():
     new_message = pyperclip.paste().lower()
 
     if new_message == "pause system":
-        temp = "System paused for 100 seconds"
-        pyperclip.copy(temp)
-        send_message()
+        send_message('System_Paused.txt')
         sleep(100)
-    elif str(df.iloc[row, 20]) == "1" or str(df.iloc[row, 20]) == "2" or str(df.iloc[row, 20]) == "3" or str(df.iloc[row, 20]) == "4": #session closed
-        get_phone_num()
-    elif new_message == "":
-        txt = open('S_Message_Del.txt', 'r')
+    elif str(df.iloc[row, 19]) == "0":
+        if new_message == "":
+            send_message('S_Message_Del.txt')
+        elif new_message == "stop":
+            send_message('SG_Stop.txt')
+            send_message('Restart.txt')
+            zero_reg()
+        elif new_message == "restart": #jump straight to open
+            send_message('S0_Introduction.txt')
+            send_message('Q1_Consent.txt')
+            zero_reg()
+            df.iloc[row, 19] = "0"
+            # Test Concent
+        elif str(df.iloc[row, 2]) == "0":
+            if new_message == "1" or new_message == "1 " or new_message == "yes" or new_message == "ja" or new_message == "ewe":
+                df.iloc[row, 2] = "1"
+                send_message('Q_ticket.txt')
+            elif new_message == "2" or new_message == "2 " or new_message == "no" or new_message == "nee" or new_message == "hayi":
+                df.iloc[row, 1] = str(int(df.iloc[row, 1]) + 1)
+                if df.iloc[row, 1] == "3":
+                    df.iloc[row, 19] = "4"
+                    send_message('S1_Consent.txt')
+                    send_message('Blocked.txt')
+                else:
+                    df.iloc[row, 19] = "3"
+                    send_message('S1_Consent.txt')
+                    send_message('Restart.txt')
+            else:
+                send_message(S_Error_1_2_only.txt)
+        elif str(df.iloc[row, 3]) == "0":
+            if new_message == "1" or new_message == "1 " or new_message == "yes" or new_message == "ja" or new_message == "ewe":
+                df.iloc[row, 3] = "1"
+                ask_for_folder_num()
+            elif new_message == "2" or new_message == "2 " or new_message == "no" or new_message == "nee" or new_message == "hayi":
+                df.iloc[row, 18] = "2"
+                df.iloc[row, 7] = "2"
+                txt = open('S_ticket.txt', 'r')
+                temp = txt.read()
+                txt.close()
+                pyperclip.copy(temp)
+                send_message()
+            else:
+                txt = open('S_Error_1_2_only.txt', 'r')
+                temp = txt.read()
+                txt.close()
+                pyperclip.copy(temp)
+                send_message()
+
+
+
+
+    elif str(df.iloc[row, 20]) == "1" or str(df.iloc[row, 20]) == "2":  # Closed Successfully
+        if new_message == "restart" or new_message == "restart." or new_message == "restart ":
+            row = len(df)
+            New_row = {"Cell": str(phone_num),
+                       "Session": str(int(df.iloc[row, 1]) + 1),
+                       "Attempts": "0",
+                       "Consent": "0",
+                       "Ticket": "0",
+                       "Folder": "0",
+                       "Date": "0",
+                       "Status": "0",
+                       "Offset": "1",
+                       "8:15": "0", "9:00": "0", "9:45": "0", "10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0",
+                       "14:30": "0", "15:15": "0", "16:00": "0",
+                       "Appointment": "0",
+                       "Outcome": "0"}
+            df = df.append(New_row, ignore_index=True)
+            txt = open('S0_Introduction.txt', 'r')
+            temp = txt.read()
+            txt.close()
+            pyperclip.copy(temp)
+            send_message()
+            txt = open('Q1_Consent.txt', 'r')
+            temp = txt.read()
+            txt.close()
+            pyperclip.copy(temp)
+            send_message()
+        else:
+            txt = open('Restart.txt', 'r')
+            temp = txt.read()
+            txt.close()
+            pyperclip.copy(temp)
+            send_message()
+    elif str(df.iloc[row, 20]) == "3":  # Closed and Unsuccessful
+        if new_message == "restart" or new_message == "restart." or new_message == "restart ":
+            df.iloc[row, 20] = "0"
+            txt = open('S0_Introduction.txt', 'r')
+            temp = txt.read()
+            txt.close()
+            pyperclip.copy(temp)
+            send_message()
+            txt = open('Q1_Consent.txt', 'r')
+            temp = txt.read()
+            txt.close()
+            pyperclip.copy(temp)
+            send_message()
+        else:
+            txt = open('Restart.txt', 'r')
+            temp = txt.read()
+            txt.close()
+            pyperclip.copy(temp)
+            send_message()
+    elif str(df.iloc[row, 20]) == "4":  # Closed and Blocked
+        txt = open('Blocked.txt', 'r')
         temp = txt.read()
         txt.close()
         pyperclip.copy(temp)
         send_message()
-    elif new_message == "stop":
-        zero_reg()
-        txt = open('SG_Stop.txt', 'r')
-        temp = txt.read()
-        txt.close()
-        pyperclip.copy(temp)
-        send_message()
-        txt = open('Restart.txt', 'r')
-        temp = txt.read()
-        txt.close()
-        pyperclip.copy(temp)
-        send_message()
+
+    return
 
 
 def zero_reg():
     global df
     global row
-    i = 20
-    while i > 2:
+    i = 19
+    while i > 1: #does not zero attempts
         df.iloc[row, i] = "0"
         i = i - 1
     df.iloc[row, 8] = "1" #offset set to 1
-    df.iloc[row, 20] = "3"  # Outcome to Unsuccsesful
+    df.iloc[row, 19] = "3" #default Closed Unsuccessful
     return
 
 def get_message():
@@ -222,11 +240,40 @@ def get_message():
     pt.hotkey('ctrl', 'c')
     return
 
-def send_message():
+def send_message(message_path):
     sleep(0.5)
+    txt = open(message_path, 'r')
+    temp = txt.read()
+    txt.close()
+    pyperclip.copy(temp)
     Paperclip = pt.locateOnScreen("Paperclip.png", confidence=.6)
     pt.moveTo(Paperclip)
     pt.moveRel(130, 0)
+    pt.click()
+    sleep(0.25)
+    pt.hotkey('ctrl', 'v')
+    pt.typewrite("\n", interval=0.01)
+    return
+
+def ask_for_folder_num():
+    txt = open('Q_Code_Number.txt', 'r')
+    temp = txt.read()
+    txt.close()
+    pyperclip.copy(temp)
+    paperclip = pt.locateOnScreen("paperclip.png", confidence=.8)
+    pt.moveTo(paperclip)
+    pt.click()
+    sleep(1)
+    pt.moveRel(0, -58)
+    sleep(100) # TEST: Check location
+    pt.click()
+    sleep(3)
+    Code_Example = pt.locateOnScreen("Code_Example.png", confidence=.7)
+    pt.moveTo(Code_Example)
+    pt.doubleClick()
+    sleep(2)
+    Caption = pt.locateOnScreen("caption.png", confidence=.8)
+    pt.moveTo(Caption)
     pt.click()
     sleep(0.25)
     pt.hotkey('ctrl', 'v')
