@@ -1,0 +1,8 @@
+*English:*
+Unfortunately, there are no more appointments slots available for your profile.
+
+*Xhosa:*
+Ngelishwa, ngokwezimpendulo uzikhethileyo awuzokwazi ukuayi nxalenye yophando
+
+*Afrikaans:*
+Ongelukkig is daar nie meer afsprake beskikbaar vir u profiel nie.
