@@ -1,1 +1,2 @@
 Cell,Attempts,Consent,Ticket,Folder,Date,Status,Offset,8:15,9:00,9:45,10:30,11:15,13:00,13:45,14:30,15:15,16:00,Appointment,Outcome
++27 78 006 0909,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0

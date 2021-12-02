@@ -94,7 +94,6 @@ def Initiate_NL(phone_num):
                "Outcome": "0"}
     df = df.append(New_row, ignore_index=True)
     row = len(df) - 1
-    print(row)
     send_message('S0_Introduction.txt')
     send_message('Q1_Consent.txt')
     df.to_csv("Patient_Log.txt", index=False)
@@ -105,7 +104,7 @@ def store_and_ask():
     # closed - check number outcome and reopen,new row etc in get and check phone number
     get_message()
     new_message = pyperclip.paste().lower()
-    print(new_message)
+
     if new_message == "pause system":
         send_message('System_Paused.txt')
         sleep(100)
@@ -139,6 +138,22 @@ def store_and_ask():
                 incorrect_answer('S_ticket.txt')
             else:
                 send_message('S_Error_1_2_only.txt')
+        elif str(df.iloc[row, 4]) == "0":
+            Fol_Num_Entry = list(new_message)
+            length = len(Fol_Num_Entry)
+            i = 0
+            Fol_Num_Char = []
+            while i < length:
+                if Fol_Num_Entry[i].isnumeric():
+                    Fol_Num_Char.append(Fol_Num_Entry[i])
+                i = i + 1
+            Fol_num_Str = str(''.join(Fol_Num_Char))
+            if Fol_num_Str.isnumeric():
+                # check it
+            else:
+                incorrect_answer('Invalid_Fol_Num.txt')
+            sleep(100)
+
 #Too be continued
     elif str(df.iloc[row, 19]) == "1" or str(df.iloc[row, 19]) == "2":  # Closed Successfully
         if new_message == "restart" or new_message == "restart." or new_message == "restart ":
