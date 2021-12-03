@@ -85,7 +85,10 @@ def Initiate_NL(phone_num):
                "Consent": "0",
                "Ticket": "0",
                "Folder": "0",
-               "Date": "0",
+               "BirthDate": "0",
+               "Name": "0",
+               "Surname": "0",
+               "TestDate": "0",
                "Status": "0",
                "Offset": "1",
                "8:15": "0", "9:00": "0", "9:45": "0", "10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0",
@@ -108,7 +111,7 @@ def store_and_ask():
     if new_message == "pause system":
         send_message('System_Paused.txt')
         sleep(100)
-    elif str(df.iloc[row, 19]) == "0":
+    elif str(df.iloc[row, 22]) == "0":
         if new_message == "":
             send_message('S_Message_Del.txt')
         elif new_message == "stop":
@@ -119,7 +122,7 @@ def store_and_ask():
             send_message('S0_Introduction.txt')
             send_message('Q1_Consent.txt')
             zero_reg()
-            df.iloc[row, 19] = "0"
+            df.iloc[row, 22] = "0"
         elif str(df.iloc[row, 2]) == "0": #Consent?
             if new_message == "1" or new_message == "1 " or new_message == "yes" or new_message == "ja" or new_message == "ewe":
                 df.iloc[row, 2] = "1"
@@ -147,28 +150,40 @@ def store_and_ask():
                 if Fol_Num_Entry[i].isnumeric():
                     Fol_Num_Char.append(Fol_Num_Entry[i])
                 i = i + 1
-            Fol_num_Str = str(''.join(Fol_Num_Char))
-            if Fol_num_Str.isnumeric():
-                # check it
+            Fol_Num_Str = str(''.join(Fol_Num_Char))
+            if Fol_Num_Str.isnumeric():
+                df.iloc[row, 4] = str(Fol_Num_Str)
+                Personal,Status,TestDate = TC_Info(Fol_Num_Str)
+                length = len(Personal)
+                if length == 5:
+                    df.iloc[row, 5] = "2"
+                    df.iloc[row, 6] = "2"
+                    df.iloc[row, 7] = "2"
+                    Csend_message('S_Error_1_2_only.txt')
+                else:
+                    #go manual
+
+                #check personal deeets length to see if it includes a B day.go manual.
+
             else:
                 incorrect_answer('Invalid_Fol_Num.txt')
             sleep(100)
 
 #Too be continued
-    elif str(df.iloc[row, 19]) == "1" or str(df.iloc[row, 19]) == "2":  # Closed Successfully
+    elif str(df.iloc[row, 22]) == "1" or str(df.iloc[row, 22]) == "2":  # Closed Successfully
         if new_message == "restart" or new_message == "restart." or new_message == "restart ":
             Initiate_NL(str(df.iloc[row, 0])) #send current phone number
         else:
             send_message('Restart.txt')
-    elif str(df.iloc[row, 19]) == "3":  # Closed and Unsuccessful
+    elif str(df.iloc[row, 22]) == "3":  # Closed and Unsuccessful
         if new_message == "restart" or new_message == "restart." or new_message == "restart ":
             send_message('S0_Introduction.txt')
             send_message('Q1_Consent.txt')
             zero_reg()
-            df.iloc[row, 19] = "0"
+            df.iloc[row, 22] = "0"
         else:
             send_message('Restart.txt')
-    elif str(df.iloc[row, 19]) == "4":  # Closed and Blocked
+    elif str(df.iloc[row, 22]) == "4":  # Closed and Blocked
         send_message('Blocked.txt')
     else:
         print("no If entered")
@@ -178,13 +193,135 @@ def store_and_ask():
 def zero_reg():
     global df
     global row
-    i = 19
+    i = 22
     while i > 1: #does not zero attempts
         df.iloc[row, i] = "0"
         i = i - 1
-    df.iloc[row, 7] = "1" #offset set to 1
-    df.iloc[row, 19] = "3" #default Closed Unsuccessful
+    df.iloc[row, 10] = "1" #offset set to 1
+    df.iloc[row, 22] = "3" #default Closed Unsuccessful
     return
+
+def TC_Info(Fol_Num_Str):
+
+    Fol_Num,TimeOut = Look_For("Fol_Num.png")
+    if TimeOut:
+        #send System error
+    else:
+        pt.moveTo(Fol_Num)
+        pt.click()
+        pyperclip.copy(Fol_Num_Str)
+        pt.hotkey('ctrl', 'v')
+        sleep(1)
+
+    if TimeOut:
+        pass
+    else:
+        TC_Advanced, TimeOut = Look_For("TC_Advanced.png")
+        if TimeOut:
+            # send System error
+            TimedOutAlready = True
+        else:
+            pt.moveTo(TC_Advanced)
+            pt.click()
+            sleep(1)
+
+    if TimeOut:
+        pass
+    else:
+        TC_Location,TimeOut = Look_For("TC_Location.png")
+        if TimeOut:
+            # send System error
+            TimedOutAlready = True
+        else:
+            TC_Location, TimeOut = Look_For("TC_Location.png")
+            pt.moveTo(TC_Location)
+            pt.click()
+            pyperclip.copy('D91')
+            pt.hotkey('ctrl', 'v')
+            sleep(1)
+
+    if TimeOut:
+        pass
+    else:
+        TC_WC,TimeOut = Look_For("TC_WC.png")
+        if TimeOut:
+            # send System error
+            TimedOutAlready = True
+        else:
+            pt.moveTo(TC_WC)
+            pt.click()
+            sleep(1)
+
+    if TimeOut:
+        pass
+    else:
+        TC_Advanced,TimeOut = Look_For("TC_Advanced.png")
+        if TimeOut:
+            # send System error
+            TimedOutAlready = True
+        else:
+            pt.moveTo(TC_Advanced)
+            pt.click()
+            sleep(1)
+
+
+    TC_Search,TimeOut = Look_For("TC_Search.png")
+    pt.moveTo(TC_Search)
+    pt.click()
+    sleep(1)
+
+    TC_DropDown,TimeOut = Look_For("TC_DropDown.png")
+    pt.moveTo(TC_DropDown)
+    pt.moveRel(-15, 0)
+    pt.click()
+    sleep(1)
+
+    TC_GXPU,TimeOut = Look_For("TC_GXPU.png")
+    pt.moveTo(TC_GXPU)
+    pt.click()
+
+    TC_Result_Page_Marker,TimeOut = Look_For("TC_Result_Page_Marker.png")
+    pt.moveTo(TC_Result_Page_Marker)
+    pt.moveRel(85, -85)
+    pt.mouseDown()
+    pt.dragRel(1300, 0, duration=1.5)
+    sleep(1)
+    pt.mouseUp()
+    pt.hotkey('ctrl', 'c')
+    temp = pyperclip.paste()
+    Personal = temp.splitlines()
+
+    status = "0"
+    while True:
+        TC_Detected = pt.locateCenterOnScreen('TC_Detected.png', confidence=.8)
+        if TC_Detected is not None:
+            status = "1"
+            break
+        TC_Not_Detected = pt.locateCenterOnScreen('TC_Not_Detected.png', confidence=.8)
+        if TC_Not_Detected is not None:
+            status = "2"
+            break
+        TC_Trace = pt.locateCenterOnScreen('TC_Trace.png', confidence=.8)
+        if TC_Trace is not None:
+            status = "3"
+            break
+        sleep(0.5)
+    return Personal,status,TestDate
+
+def Look_For(Image):
+    i = 0
+    TimeOut = False
+    while True:
+        Temp = pt.locateCenterOnScreen(Image, confidence=.8)
+        if Temp is not None:
+            break
+        if i > 30:
+            TimeOut = True
+            break
+        i = i + 1
+        sleep(0.5)
+    return Temp,TimeOut
+
 
 def get_message():
     sleep(0.5)
@@ -264,7 +401,7 @@ def incorrect_answer(reason):
     global row
     df.iloc[row, 1] = str(int(df.iloc[row, 1]) + 1)
     if str(df.iloc[row, 1]) == "3":
-        df.iloc[row, 19] = "4"
+        df.iloc[row, 22] = "4"
         send_message(reason)
         send_message('Blocked.txt')
     else:
