@@ -159,7 +159,7 @@ def store_and_ask():
                     df.iloc[row, 5] = "2"
                     df.iloc[row, 6] = "2"
                     df.iloc[row, 7] = "2"
-                    Csend_message('S_Error_1_2_only.txt')
+                    send_message('S_Error_1_2_only.txt')
                 else:
                     #go manual
 
@@ -202,10 +202,68 @@ def zero_reg():
     return
 
 def TC_Info(Fol_Num_Str):
+    global df
+    global row
 
-    Fol_Num,TimeOut = Look_For("Fol_Num.png")
-    if TimeOut:
-        #send System error
+    #Move to TC window
+    mag_dots, Error = Look_For("mag_dots.png")
+    if Error:
+        return True
+    else:
+        pt.moveTo(mag_dots)
+        pt.moveRel(80,0)
+        pt.click()
+        sleep(1)
+
+    while True:
+        TC_logonWindow = pt.locateCenterOnScreen("TC_logonWindow.png", confidence=.8)
+        if TC_logonWindow is not None:
+            TC_LogonUser = pt.locateCenterOnScreen("TC_LogonUser.png", confidence=.8)
+            pt.moveTo(TC_LogonUser)
+            pt.click()
+            sleep(0.25)
+            pyperclip.copy('NMBB5280')
+            pt.hotkey('ctrl', 'v')
+            sleep(1)
+            TC_LogonPassword = pt.locateCenterOnScreen("TC_LogonPassword.png", confidence=.8)
+            pt.moveTo(TC_LogonPassword)
+            pt.click()
+            sleep(0.25)
+            pyperclip.copy('123America#NHLS')
+            pt.hotkey('ctrl', 'v')
+            sleep(1)
+            pt.click()
+            sleep(1)
+            TC_LogonButton = pt.locateCenterOnScreen("TC_LogonButton.png", confidence=.8)
+            pt.moveTo(TC_LogonButton)
+            pt.click()
+            break
+        if i > 100:
+            TC_LockedWindow = pt.locateCenterOnScreen("TC_LockedWindow.png", confidence=.8)
+            if TC_LockedWindow is not None:
+                TC_LockedPassword = pt.locateCenterOnScreen("TC_LockedPassword.png", confidence=.8)
+                pt.moveTo(TC_LockedPassword)
+                pt.click()
+                sleep(1)
+                pyperclip.copy('123America#NHLS')
+                pt.hotkey('ctrl', 'v')
+                sleep(1)
+                pt.click()
+                sleep(1)
+                TC_LogonButton = pt.locateCenterOnScreen("TC_LogonButton.png", confidence=.8)
+                pt.moveTo(TC_LogonButton)
+                pt.click()
+                break
+            else:
+                TC_Logout()
+                return True
+        i = i + 1
+        sleep(1)
+
+    # Enter Folder number
+    Fol_Num,Error = Look_For("Fol_Num.png")
+    if Error:
+        return True
     else:
         pt.moveTo(Fol_Num)
         pt.click()
@@ -213,114 +271,259 @@ def TC_Info(Fol_Num_Str):
         pt.hotkey('ctrl', 'v')
         sleep(1)
 
-    if TimeOut:
-        pass
+    # Open advanced Search
+    TC_Advanced, Error = Look_For("TC_Advanced.png")
+    if Error:
+        return True
     else:
-        TC_Advanced, TimeOut = Look_For("TC_Advanced.png")
-        if TimeOut:
-            # send System error
-            TimedOutAlready = True
-        else:
-            pt.moveTo(TC_Advanced)
-            pt.click()
-            sleep(1)
+        pt.moveTo(TC_Advanced)
+        pt.click()
+        sleep(1)
 
-    if TimeOut:
-        pass
+    # Enter location
+    TC_Location, Error = Look_For("TC_Location.png")
+    if Error:
+        return True
     else:
-        TC_Location,TimeOut = Look_For("TC_Location.png")
-        if TimeOut:
-            # send System error
-            TimedOutAlready = True
-        else:
-            TC_Location, TimeOut = Look_For("TC_Location.png")
-            pt.moveTo(TC_Location)
-            pt.click()
-            pyperclip.copy('D91')
-            pt.hotkey('ctrl', 'v')
-            sleep(1)
+        pt.moveTo(TC_Location)
+        pt.click()
+        pyperclip.copy('D91')
+        pt.hotkey('ctrl', 'v')
+        sleep(1)
 
-    if TimeOut:
-        pass
+    # Select WC location
+    TC_WC, Error = Look_For("TC_WC.png")
+    if Error:
+        return True
     else:
-        TC_WC,TimeOut = Look_For("TC_WC.png")
-        if TimeOut:
-            # send System error
-            TimedOutAlready = True
-        else:
-            pt.moveTo(TC_WC)
-            pt.click()
-            sleep(1)
+        pt.moveTo(TC_WC)
+        pt.click()
+        sleep(1)
 
-    if TimeOut:
-        pass
+    # Close advanced Search
+    TC_Advanced, Error = Look_For("TC_Advanced.png")
+    if Error:
+        return True
     else:
-        TC_Advanced,TimeOut = Look_For("TC_Advanced.png")
-        if TimeOut:
-            # send System error
-            TimedOutAlready = True
-        else:
-            pt.moveTo(TC_Advanced)
-            pt.click()
-            sleep(1)
+        pt.moveTo(TC_Advanced)
+        pt.click()
+        sleep(1)
 
+    # Click on Search
+    TC_Search, Error = Look_For("TC_Search.png")
+    if Error:
+        return True
+    else:
+        pt.moveTo(TC_Search)
+        pt.click()
+        sleep(1)
 
-    TC_Search,TimeOut = Look_For("TC_Search.png")
-    pt.moveTo(TC_Search)
-    pt.click()
-    sleep(1)
+    # Valid Folder Number Check and Collect personal detail
+    while True:
+        TC_DropDown = pt.locateCenterOnScreen("TC_DropDown.png", confidence=.8)
+        if TC_DropDown is not None:
+            break
+        if i > 100:
+            TC_Logout()
+            send_bvb_message()
+            incorrect_answer("Invalid_Fol_Num.txt")
+            return True
+        i = i + 1
+        sleep(0.5)
 
-    TC_DropDown,TimeOut = Look_For("TC_DropDown.png")
+    #Collect personal detail
     pt.moveTo(TC_DropDown)
-    pt.moveRel(-15, 0)
-    pt.click()
-    sleep(1)
-
-    TC_GXPU,TimeOut = Look_For("TC_GXPU.png")
-    pt.moveTo(TC_GXPU)
-    pt.click()
-
-    TC_Result_Page_Marker,TimeOut = Look_For("TC_Result_Page_Marker.png")
-    pt.moveTo(TC_Result_Page_Marker)
-    pt.moveRel(85, -85)
+    pt.moveRel(30, 0)
     pt.mouseDown()
-    pt.dragRel(1300, 0, duration=1.5)
+    pt.dragRel(900, 0, duration=1.5)
     sleep(1)
     pt.mouseUp()
     pt.hotkey('ctrl', 'c')
     temp = pyperclip.paste()
     Personal = temp.splitlines()
+    length = len(Personal)
+    if length == 4:
+        df.iloc[row, 5] = Personal[3]
+        df.iloc[row, 6] = Personal[0]
+        df.iloc[row, 7] = Personal[1]
+    else:
+        TC_Logout()
+        send_bvb_message()
+        send_work_message()
+        send_message("Personal_Detail_Incomplete.txt")
+        send_message('Manual.txt')
+        zero_reg()
+        return True
 
-    status = "0"
+    # Open dropdown Action
+    TC_DropDown, Error = Look_For("TC_DropDown.png")
+    if Error:
+        return True
+    else:
+        pt.moveTo(TC_DropDown)
+        pt.moveRel(-15, 0)
+        pt.click()
+        sleep(1)
+
+    # GXPU been conducted?
+    while True:
+        TC_GXPU = pt.locateCenterOnScreen("TC_GXPU.png", confidence=.8)
+        if TC_GXPU is not None:
+            break
+        if i > 20:
+            TC_Logout()
+            send_bvb_message()
+            incorrect_answer("No_GXPU.txt")
+            return True
+        i = i + 1
+        sleep(1)
+
+    # GXPU Proccesed yet?
+    pt.moveTo(TC_GXPU)
+    pt.click()
+    while True:
+        TC_Result_Page = pt.locateCenterOnScreen("TC_Result_Page.png", confidence=.8)
+        if TC_Result_Page is not None: #GXPU processed
+            Error = GetTestDate()
+            if Error:
+                return True
+            Error = GetStatus()
+            if Error:
+                return True
+            break
+        if i > 30: #GXPU Not yet processed
+            df.iloc[row, 8] = str(datetime.now().date())
+            df.iloc[row, 9] = "4"
+            break
+        i = i + 1
+        sleep(1)
+    TC_Logout()
+    return False
+
+def GetStatus():
+    global dt
+    global row
+    Error = False
     while True:
         TC_Detected = pt.locateCenterOnScreen('TC_Detected.png', confidence=.8)
         if TC_Detected is not None:
-            status = "1"
+            df.iloc[row, 9] = "1"
             break
         TC_Not_Detected = pt.locateCenterOnScreen('TC_Not_Detected.png', confidence=.8)
         if TC_Not_Detected is not None:
-            status = "2"
+            df.iloc[row, 9] = "2"
             break
         TC_Trace = pt.locateCenterOnScreen('TC_Trace.png', confidence=.8)
         if TC_Trace is not None:
-            status = "3"
+            df.iloc[row, 9] = "3"
             break
-        sleep(0.5)
-    return Personal,status,TestDate
+        if i > 20:
+            TC_Logout()
+            send_bvb_message()
+            send_work_message()
+            send_message("GXPU_Result_Undefined.txt")
+            send_message('Manual.txt')
+            zero_reg()
+            Error = True
+            break
+        sleep(1)
+        i = i + 1
+    return Error
+
+def GetTestDate():
+    global dt
+    global row
+    Error = False
+    while True:
+        TC_TestDate = pt.locateCenterOnScreen('TC_TestDate.png', confidence=.8)
+        if TC_TestDate is not None:
+            pt.moveTo(TC_TestDate)
+            pt.moveRel(60, 0)
+            pt.tripleClick()
+            pt.hotkey('ctrl','c')
+            TestDate = pyperclip.paste()
+            TestdateSeperated = TestDate.split("/")
+            TestdateFormated = TestdateSeperated[0] + "-" + TestdateSeperated[1] + "-" + TestdateSeperated[2]
+            df.iloc[row, 8] = TestdateFormated
+            break
+        if i > 20:
+            TC_Logout()
+            send_bvb_message()
+            send_work_message()
+            send_message("TestDate_Undefined.txt")
+            send_message('Manual.txt')
+            zero_reg()
+            break
+        sleep(1)
+        i = i + 1
+    return Error
+
 
 def Look_For(Image):
+    global df
+    global row
     i = 0
-    TimeOut = False
+    Error = False
     while True:
         Temp = pt.locateCenterOnScreen(Image, confidence=.8)
         if Temp is not None:
             break
-        if i > 30:
-            TimeOut = True
+        if i > 100:
+            Error = True
+            TC_Logout()
+            send_bvb_message()
+            send_work_message()
+            send_message("SysDown_Manual.txt")
+            df.iloc[row, 22] = "5" # manual
             break
         i = i + 1
-        sleep(0.5)
-    return Temp,TimeOut
+        sleep(1)
+    return Temp,Error
+
+def TC_Logout():
+    while True:
+        TC_URLMarker = pt.locateCenterOnScreen("TC_URLMarker.png", confidence=.8)
+        if TC_URLMarker is not None:
+            pt.moveTo(TC_URLMarker)
+            pt.moveRel(200, 15)
+            pt.tripleClick()
+            pyperclip.copy('https://trakcarelabwebview.nhls.ac.za/trakcarelab/csp/system.Home.cls#/Logout')
+            sleep(0.25)
+            pt.hotkey('ctrl', 'v')
+            sleep(0.25)
+            pt.hotkey('enter')
+            sleep(0.25)
+            pt.moveTo(150, 35)
+            pt.click()
+            sleep(1)
+            break
+        if i > 10:
+            pt.moveTo(150,35)
+            pt.click()
+            sleep(1)
+            send_bvb_message("TC_URLMarker_NotFound.txt")
+            sleep
+            break
+        i = i + 1
+        sleep(1)
+    return
+
+def send_bvb_message(message_path):
+    sleep(0.5)
+    txt = open(message_path, 'r')
+    temp = txt.read()
+    txt.close()
+    pyperclip.copy(temp)
+    Paperclip = pt.locateOnScreen("Paperclip.png", confidence=.6)
+    pt.moveTo(Paperclip)
+    pt.moveRel(130, 0)
+    pt.click()
+    sleep(0.25)
+    pt.hotkey('ctrl', 'v')
+    pt.typewrite("\n", interval=0.01)
+    return
+
+def send_work_message():
 
 
 def get_message():
