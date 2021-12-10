@@ -5,22 +5,26 @@ from datetime import timedelta
 import pyperclip
 import pandas
 sleep(2)
-#trace 153437181
+#trace 153437181+27 78 006 0909
 #Neg 42033779
 #Pos 34003368
 #pending 174068668
-def count():
-    TC_DropDown = pt.locateCenterOnScreen("TC_DropDown.png", confidence=.8)
-    pt.moveTo(TC_DropDown)
-    pt.moveRel(30, 0)
-    pt.mouseDown()
-    pt.dragRel(900, 0, duration=1.5)
-    sleep(1)
-    pt.mouseUp()
-    pt.hotkey('ctrl', 'c')
+
+def calculate_age():
     temp = pyperclip.paste()
     Personal = temp.splitlines()
+    sleep(1)
     length = len(Personal)
-    if '/' in Personal[length-1]:
-        print(Personal[length-1])
-count()
+    print(length)
+    if all(i.isalpha() or i.isspace() for i in Personal[0].strip()):
+        print(Personal[0].strip())
+    else:
+        print('nope')
+    if all(i.isalpha() or i.isspace() for i in Personal[1].strip()):
+        print(Personal[1].strip())
+    else:
+        print('nope')
+
+
+calculate_age()
+
