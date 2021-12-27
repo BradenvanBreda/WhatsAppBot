@@ -1,0 +1,8 @@
+﻿_English_
+Your appointment has been booked successfully.
+
+_Xhosa_
+Idinga lakho libhukishiwe ngempumelelo ixesha sele ulibekelwe.
+
+_Afrikaans_
+U afspraak is suksesvol bespreek.

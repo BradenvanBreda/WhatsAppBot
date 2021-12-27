@@ -1,17 +1,17 @@
-*English:*
-Were you given an "Appointment Ticket" like the example above?
+﻿_English_
+Were you given an AI DIAGNOSTICS ticket like the example above?
 _Answer with only a *1* or *2*:_
 *1* - Yes
 *2* - No
 
-*Xhosa:*
-Ukhe wanikwa "Appointment Ticket" njengomzekelo ongentla?
-_Phendula kuphela *1* okanye *2*:_
+_Xhosa_
+Ukhe wanikwa itikiti lakwa-AI DIAGNOSTICS njengomzekelo ongasentla?
+_Phendula kuphela ngo *1* okanye u *2*:_
 *1* - Ewe
 *2* - Hayi
 
-*Afrikaans:*
-Is u n "Appointment Ticket" gegee soos die voorbeeld hierbo?
+_Afrikaans_
+Is u n AI DIAGNOSTICS kaartjie gegee soos die voorbeeld hierbo?
 _Antwoord slegs met 'n *1* of *2*:_
 *1* - Ja
 *2* - Nee

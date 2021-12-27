@@ -1,0 +1,8 @@
+﻿_English_
+The number you submitted does not match any of the options provided.
+
+_Xhosa_
+Inani olinikezileyo alihambelani naluphi na ukhetho olinikiweyo.
+
+_Afrikaans_
+Die nommer wat u gestuur het, stem nie ooreen met enige van die opsies wat verskaf was nie.

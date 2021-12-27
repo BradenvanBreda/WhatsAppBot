@@ -1,0 +1,8 @@
+﻿_English_
+Deleted message detected. Please resend if necessary.
+
+_Xhosa_
+Umyalezo ocinyiweyo ufunyenwe. Nceda uthumele kwakhona ukuba kuyimfuneko.
+
+_Afrikaans_
+Geskrapte boodskap bespeur. Stuur asseblief weer indien dit nodig is.

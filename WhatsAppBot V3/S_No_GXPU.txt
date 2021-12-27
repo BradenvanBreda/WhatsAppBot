@@ -1,0 +1,11 @@
+﻿_English_
+Note,  there are multiple tests and ways in which the Western Cape and CoCT clinics diagnose TB. However, in this study, we only look at the GXPU result and test date to see if patients qualify for the study. 
+No GXPU test results were found on your medical records. *Therefore you do not qualify for this study.*
+
+_Xhosa_
+Qaphela, kukho iimvavanyo ezininzi kunye neendlela apho intshona koloni kunye neekliniki ze-CoCT ziyixilonga ngazo i-TB. Nangona kunjalo, kolu phononongo sijonga kuphela iziphumo ze-GXPU kunye nomhla wovavanyo ukubona ukuba izigulane ziyalufanela na uphononongo.
+Iziphumo zovavanyo lwakho lwe-GXPU azifunyenwanga kwiirekhodi zakho zonyango. *Ngoko ke awulilungeli olu phononongo.*
+
+_Afrikaans_
+Let wel, daar is verskeie toetse en maniere waarop die Wes-Kaap en CoCT klinieke TB diagnoseer. In hierdie studie kyk ons egter net na die GXPU-uitslag en toetsdatum om te sien of pasiënte vir die studie kwalifiseer.
+Geen GXPU-toetsresultate is op u mediese rekords gevind nie. *Jy kwalifiseer dus nie vir hierdie studie nie.*

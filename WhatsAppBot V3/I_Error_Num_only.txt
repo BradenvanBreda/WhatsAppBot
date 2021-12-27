@@ -1,0 +1,8 @@
+﻿_English_
+Reply with a number only.
+
+_Xhosa_
+Phendula ngenani kuphela.
+
+_Afrikaans_
+Antwoord slegs met 'n nommer.

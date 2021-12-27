@@ -1,4 +1,0 @@
-We apologies, our patient information verification system is currently down.
-We are working to have the issue fixed ASAP.
-We should have the issue resolved in the next hour.
-In an hour reply with just the word *RESTART* to begin a new screening session.

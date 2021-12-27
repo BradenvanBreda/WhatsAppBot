@@ -11,19 +11,10 @@ sleep(2)
 #pending 174068668
 
 def calculate_age():
-    temp = pyperclip.paste()
-    Personal = temp.splitlines()
-    sleep(1)
-    length = len(Personal)
-    print(length)
-    if all(i.isalpha() or i.isspace() for i in Personal[0].strip()):
-        print(Personal[0].strip())
-    else:
-        print('nope')
-    if all(i.isalpha() or i.isspace() for i in Personal[1].strip()):
-        print(Personal[1].strip())
-    else:
-        print('nope')
+    Temp = pt.locateCenterOnScreen('TC_NameMarkerEnd.png', confidence=.8)
+    pt.moveTo(Temp)
+
+
 
 
 calculate_age()

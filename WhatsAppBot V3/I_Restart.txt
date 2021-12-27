@@ -1,0 +1,8 @@
+﻿_English_
+To begin a new study eligibility screening session, reply with the word: RESTART
+
+_Xhosa_
+Ukuqalisa iseshoni yokuhlola entsha yovavanyo phendula ngegama: RESTART
+
+_Afrikaans_
+Om 'n nuwe studiekwalifikasie-siftingsessie te begin, stuur n boodskap met die woord: RESTART

@@ -1,2 +1,0 @@
-Cell,Attempts,Consent,Ticket,Folder,BirthDate,Name,Surname,TestDate,Status,Confirmed,Offset,8:15,9:00,9:45,10:30,11:15,13:00,13:45,14:30,15:15,16:00,OptionDate,AppointTime,Outcome
-

@@ -1,0 +1,8 @@
+﻿_English_
+Appointment cancelled.
+
+_Xhosa_
+Asizokwazi ukuqhubeka nophando.
+
+_Afrikaans_
+Afspraak gekanselleer.

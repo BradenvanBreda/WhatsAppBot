@@ -6,11 +6,11 @@ from datetime import datetime
 from datetime import timedelta
 import pyperclip
 import pandas
-sleep(1)
+sleep(10)
 
 def check_for_new_message():
     global df
-    df = pandas.read_csv("Patient_Log.txt")
+    df = pandas.read_csv("D_Patient_Log.txt")
     # gui check for new message or green dots
     while True:
         sleep(1)
@@ -61,7 +61,7 @@ def get_phone_num():
     pt.moveTo(Close)
     pt.click()
     sleep(0.25)
-    df.to_csv("auto_backup.txt", index=False)
+    df.to_csv("D_auto_backup.txt", index=False)
 
     i = len(df)
     match = False
@@ -99,9 +99,9 @@ def Initiate_NL(phone_num):
                "Outcome": "0"}
     df = df.append(New_row, ignore_index=True)
     row = len(df) - 1
-    send_message('S0_Introduction.txt')
-    send_message('Q1_Consent.txt')
-    df.to_csv("Patient_Log.txt", index=False)
+    send_message('I_Introduction.txt')
+    send_message('Q_Consent.txt')
+    df.to_csv("D_Patient_Log.txt", index=False)
 
 def store_and_ask():
     global df
@@ -111,38 +111,40 @@ def store_and_ask():
     new_message = pyperclip.paste().lower()
 
     if new_message == "pause system":
-        send_message('System_Paused.txt')
+        send_message('S_System_Paused.txt')
         sleep(100)
     elif str(df.iloc[row, 24]) == "0":
         if new_message == "":
             send_message('S_Message_Del.txt')
         elif new_message == "stop":
-            send_message('SG_Stop.txt')
-            send_message('Restart.txt')
-            zero_reg()
+            send_message('S_Stop.txt')
+            send_message('I_Restart.txt')
         elif new_message == "restart": #jump straight to open
-            send_message('S0_Introduction.txt')
-            send_message('Q1_Consent.txt')
+            send_message('I_Introduction.txt')
+            send_message('Q_Consent.txt')
             zero_reg()
-            df.iloc[row, 24] = "0"
         elif str(df.iloc[row, 2]) == "0": #Consent?
             if new_message == "1" or new_message == "1 " or new_message == "yes" or new_message == "ja" or new_message == "ewe":
                 df.iloc[row, 2] = "1"
                 ask_for_ticket()
             elif new_message == "2" or new_message == "2 " or new_message == "no" or new_message == "nee" or new_message == "hayi":
                 df.iloc[row, 2] = "2"
-                incorrect_answer('S1_Consent.txt')
+                send_message('S_Consent.txt')
+                send_message('I_Restart.txt')
+                df.iloc[row, 24] = "2"
             else:
-                send_message('S_Error_1_2_only.txt')
+                send_message('I_Error_1_2_only.txt')
         elif str(df.iloc[row, 3]) == "0": #Ticket?
             if new_message == "1" or new_message == "1 " or new_message == "yes" or new_message == "ja" or new_message == "ewe":
                 df.iloc[row, 3] = "1"
                 ask_for_folder_num()
             elif new_message == "2" or new_message == "2 " or new_message == "no" or new_message == "nee" or new_message == "hayi":
                 df.iloc[row, 3] = "2"
-                incorrect_answer('S_ticket.txt')
+                send_message('S_ticket.txt')
+                send_message('I_Restart.txt')
+                df.iloc[row, 24] = "2"
             else:
-                send_message('S_Error_1_2_only.txt')
+                send_message('I_Error_1_2_only.txt')
         elif str(df.iloc[row, 4]) == "0":
             Fol_Num_Entry = list(new_message)
             length = len(Fol_Num_Entry)
@@ -155,59 +157,68 @@ def store_and_ask():
             Fol_Num_Str = str(''.join(Fol_Num_Char))
             if Fol_Num_Str.isnumeric():
                 df.iloc[row, 4] = str(Fol_Num_Str)
-                Error = TC_Info(Fol_Num_Str)
-                if not Error:
-                    # Create name message to send
-                    txt = open('DOB_Correct.txt', 'r')
-                    temp = txt.read()
-                    txt.close()
-                    MessageToSend = open("MessageToSend.txt", "w")
-                    MessageToSend.write('*' + str(df.iloc[row, 5]) + '*' + "\n" + "\n" + str(temp))
-                    MessageToSend.close()
-                    # check age
-                    dt_obj = datetime.strptime(str(df.iloc[row, 5]), '%Y-%m-%d').date()
-                    today = datetime.now().date()
-                    age = today.year - dt_obj.year - ((today.month, today.day) < (dt_obj.month, dt_obj.day))
-                    if age >= 14:
-                        if str(df.iloc[row, 9]) == 1 or str(df.iloc[row, 9]) == 2:  # GXPU pos trace
-                            dt_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d').date()
-                            today = datetime.now().date()
-                            Days_ago = (today - dt_obj).days
-                            if Days_ago <= 13:
-                                send_message('MessageToSend.txt')
-                            else:
-                                send_message("GXPU_Pos_Time_Exclusion.txt")
-                                zero_reg()
-                        elif str(df.iloc[row, 9]) == 3:  # GXPU Neg
-                            dt_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d').date()
-                            today = datetime.now().date()
-                            Days_ago = (today - dt_obj).days
-                            if Days_ago <= 2:
-                                send_message('MessageToSend.txt')
-                            else:
-                                send_message("GXPU_Neg_Time_Exclusion.txt")
-                                zero_reg()
-                        else:  # pending
-                            send_message('MessageToSend.txt')
-                    else:
-                        send_message("Too_Young.txt")
-                        zero_reg()
-                else:  # errors messages and register resets are dealt with in TC_INFO
-                    pass
+                match = FolderNum_Match(Fol_Num_Str)
+                if not match:
+                    Error = TC_Info(Fol_Num_Str)
+                    if not Error:
+                        # Create name message to send
+                        txt = open('Q_DOB_Correct.txt', 'r', encoding='utf-8-sig')
+                        temp = txt.read()
+                        txt.close()
+                        MessageToSend = open("D_MessageToSend.txt", "w")
+                        MessageToSend.write('*' + str(df.iloc[row, 5]) + '*' + "\n" + "\n" + str(temp))
+                        MessageToSend.close()
+                        # check age
+                        dt_obj = datetime.strptime(str(df.iloc[row, 5]), '%Y-%m-%d').date()
+                        today = datetime.now().date()
+                        age = today.year - dt_obj.year - ((today.month, today.day) < (dt_obj.month, dt_obj.day))
+                        if age >= 14:
+                            if str(df.iloc[row, 9]) == '1' or str(df.iloc[row, 9]) == '2':  # GXPU pos trace
+                                dt_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d').date()
+                                today = datetime.now().date()
+                                Days_ago = (today - dt_obj).days
+                                if Days_ago <= 14:
+                                    send_message('D_MessageToSend.txt')
+                                else:
+                                    send_message("S_GXPU_Pos_Time_Exclusion.txt")
+                                    send_message('I_Restart.txt')
+                                    df.iloc[row, 24] = "2"
+                            elif str(df.iloc[row, 9]) == '3':  # GXPU Neg
+                                dt_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d').date()
+                                today = datetime.now().date()
+                                Days_ago = (today - dt_obj).days
+                                if Days_ago <= 3:
+                                    send_message('D_MessageToSend.txt')
+                                else:
+                                    send_message("S_GXPU_Neg_Time_Exclusion.txt")
+                                    send_message('I_Restart.txt')
+                                    df.iloc[row, 24] = "2"
+                            else:  # str(df.iloc[row, 9]) == 4: pending
+                                send_message('D_MessageToSend.txt')
+                        else:
+                            send_message("S_Too_Young.txt")
+                            send_message('I_Restart.txt')
+                            df.iloc[row, 24] = "2"
+                    else:  # errors messages and register resets are dealt with in TC_INFO
+                        pass
+                else:
+                    incorrect_answer('S_Used_FolNum.txt')
             else:
-                incorrect_answer('Invalid_Fol_Num.txt')
-        elif str(df.iloc[row, 10]) == "0": #Personal detail correct
+                send_message('S_Invalid_Fol_Num.txt')
+                send_message('I_Restart.txt')
+                df.iloc[row, 24] = "2"
+        elif str(df.iloc[row, 10]) == "0": #Personal detail correct??
             if new_message == "1" or new_message == "1 " or new_message == "yes" or new_message == "ja" or new_message == "ewe":
                 df.iloc[row, 10] = "1"
                 find_available_date()
             elif new_message == "2" or new_message == "2 " or new_message == "no" or new_message == "nee" or new_message == "hayi":
                 df.iloc[row, 10] = "2"
-                incorrect_answer('Incorrect_FolNum.txt')
+                incorrect_answer('S_Incorrect_FolNum.txt')
             else:
-                send_message('S_Error_1_2_only.txt')
+                send_message('I_Error_1_2_only.txt')
         elif str(df.iloc[row, 23]) == "0":
             if new_message == "0" or new_message == "0 ":
-                df.iloc[row, 11] = int(str(df.iloc[row, 11])) + 1
+                df.iloc[row, 11] = str(int(str(df.iloc[row, 11])) + 1)
                 find_available_date()
             elif new_message == "11" or new_message == "11 ":
                 df.iloc[row, 11] = "1"
@@ -216,42 +227,40 @@ def store_and_ask():
                 send_message('S_Cancel_Options.txt')
                 if str(df.iloc[row, 9]) == "4":
                     send_message('S_Waiting_Restart.txt')
-                    df.iloc[row, 24] = "3"
+                    df.iloc[row, 24] = "2"
             elif new_message.isnumeric():
                 selected = int(new_message)
                 check_selection(selected)
             else:
-                send_message('S_Error_Num_only.txt')
-    elif str(df.iloc[row, 24]) == "1" or str(df.iloc[row, 24]) == "2":  # Closed Successfully
+                send_message('I_Error_Num_only.txt')
+    elif str(df.iloc[row, 24]) == "1":  # Closed Successfully
         if new_message == "restart" or new_message == "restart." or new_message == "restart ":
             Initiate_NL(str(df.iloc[row, 0])) #send current phone number
         else:
-            send_message('Restart.txt')
-    elif str(df.iloc[row, 24]) == "3" or str(df.iloc[row, 24]) == "5":  # Closed and Unsuccessful
+            send_message('I_Restart.txt')
+    elif str(df.iloc[row, 24]) == "2":  # Closed and Unsuccessful
         if new_message == "restart" or new_message == "restart." or new_message == "restart ":
-            send_message('S0_Introduction.txt')
-            send_message('Q1_Consent.txt')
+            send_message('I_Introduction.txt')
+            send_message('Q_Consent.txt')
             zero_reg()
-            df.iloc[row, 24] = "0"
         else:
-            send_message('Restart.txt')
-    elif str(df.iloc[row, 24]) == "4":  # Closed and Blocked
-        send_message('Blocked.txt')
+            send_message('I_Restart.txt')
+    elif str(df.iloc[row, 24]) == "3":  # Closed and Blocked
+        send_message('S_Blocked.txt')
     else:
         print("no If Statement entered")
-    df.to_csv("Patient_Log.txt", index=False)
+    df.to_csv("D_Patient_Log.txt", index=False)
     return
 
 def zero_reg():
     global df
     global row
     i = 24
-    while i > 1: #does not zero attempts
+    while i > 1: #does not zero attempts and makes channel open
         df.iloc[row, i] = "0"
         i = i - 1
     df.iloc[row, 11] = "1" #offset set to 1
-    df.iloc[row, 24] = "3" #default Closed Unsuccessful
-    df.to_csv("Patient_Log.txt", index=False)
+    df.to_csv("D_Patient_Log.txt", index=False)
     return
 
 def get_message():
@@ -265,8 +274,7 @@ def get_message():
     return
 
 def send_message(message_path):
-    sleep(0.5)
-    txt = open(message_path, 'r')
+    txt = open(message_path, 'r',  encoding='utf-8-sig')
     temp = txt.read()
     txt.close()
     pyperclip.copy(temp)
@@ -276,10 +284,12 @@ def send_message(message_path):
     pt.click()
     sleep(0.25)
     pt.hotkey('ctrl', 'v')
-    pt.typewrite("\n", interval=0.01)
+    sleep(0.25)
+    pt.hotkey('enter')
     return
 
 def send_message_to(message_path,CellNum,CellImage):
+    sleep(1)
     WA_SearchNum = pt.locateCenterOnScreen("WA_SearchNum.png", confidence=.9)
     pt.moveTo(WA_SearchNum)
     pt.click()
@@ -303,7 +313,7 @@ def send_message_to(message_path,CellNum,CellImage):
     return
 
 def ask_for_ticket():
-    txt = open('Q_ticket.txt', 'r')
+    txt = open('Q_ticket.txt', 'r', encoding='utf-8-sig')
     temp = txt.read()
     txt.close()
     pyperclip.copy(temp)
@@ -327,7 +337,7 @@ def ask_for_ticket():
     return
 
 def ask_for_folder_num():
-    txt = open('Q_Folder_Number.txt', 'r')
+    txt = open('Q_Folder_Number.txt', 'r', encoding='utf-8-sig')
     temp = txt.read()
     txt.close()
     pyperclip.copy(temp)
@@ -355,14 +365,14 @@ def incorrect_answer(reason):
     global row
     df.iloc[row, 1] = str(int(df.iloc[row, 1]) + 1)
     if str(df.iloc[row, 1]) == "3":
-        df.iloc[row, 24] = "4"
+        df.iloc[row, 24] = "3"
         send_message(reason)
-        send_message('Blocked.txt')
-        df.to_csv("Patient_Log.txt", index=False)
+        send_message('S_Blocked.txt')
+        df.to_csv("D_Patient_Log.txt", index=False)
     else:
         send_message(reason)
-        send_message('Restart.txt')
-        zero_reg()
+        send_message('I_Restart.txt')
+        df.iloc[row, 24] = "2"
     return
 
 def TC_Info(Fol_Num_Str):
@@ -370,82 +380,42 @@ def TC_Info(Fol_Num_Str):
     global row
 
     #Move to TC window
-    mag_dots, Error = Look_For("mag_dots.png")
+    To_TC()
+
+    #Login
+    TC_logonWindow, Error = Look_For("TC_logonWindow.png") #differenciate between lock and logon
     if Error:
         return True
     else:
-        pt.moveTo(mag_dots)
-        pt.moveRel(80,0)
-        pt.click()
-        sleep(1)
-
-    #Login/unlock
-    i=0
-    while True:
-        TC_logonWindow = pt.locateCenterOnScreen("TC_logonWindow.png", confidence=.9)
-        if TC_logonWindow is not None:
-            TC_LogonUser, Error = Look_For("TC_LogonUser.png")
-            if Error:
-                return True
-            else:
-                pt.moveTo(TC_LogonUser)
-                pt.click()
-                sleep(0.25)
-                pyperclip.copy('NMBB5280')
-                pt.hotkey('ctrl', 'v')
-                sleep(1)
-            TC_LogonPassword, Error = Look_For("TC_LogonPassword.png")
-            if Error:
-                return True
-            else:
-                pt.moveTo(TC_LogonPassword)
-                pt.click()
-                sleep(0.25)
-                pyperclip.copy('123America#NHLS')
-                pt.hotkey('ctrl', 'v')
-                sleep(1)
-                pt.click()
-                sleep(1)
-            TC_LogonButton, Error = Look_For("TC_LogonButton.png")
-            if Error:
-                return True
-            else:
-                pt.moveTo(TC_LogonButton)
-                pt.click()
-            break
-        if i > 100:
-            TC_LockedWindow = pt.locateCenterOnScreen("TC_LockedWindow.png", confidence=.8)
-            if TC_LockedWindow is not None:
-                TC_LockedPassword, Error = Look_For("TC_LockedPassword.png")
-                if Error:
-                    return True
-                else:
-                    pt.moveTo(TC_LockedPassword)
-                    pt.click()
-                    sleep(1)
-                    pyperclip.copy('123America#NHLS')
-                    pt.hotkey('ctrl', 'v')
-                    sleep(1)
-                    pt.click()
-                    sleep(1)
-                    TC_LogonButton = pt.locateCenterOnScreen("TC_LogonButton.png", confidence=.8)
-                    pt.moveTo(TC_LogonButton)
-                    pt.click()
-                break
-            else:
-                TC_Logout()
-                send_message("TC_SysDown.txt")
-                MessageToSend = open("MessageToSend.txt", "w")
-                MessageToSend.write("TrakCare Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                    + "Cell#:" + str(df.iloc[row, 0]))
-                MessageToSend.close()
-                send_message_to('MessageToSend.txt', "+27 72 895 9231","WA_BvBNum.png")
-                # send_message_to('MessageToSend.txt', "+27 82 075 8484","WA_WorkNum.png")
-                zero_reg()
-                df.iloc[row, 24] = "5"
-                return True
-        i = i + 1
-        sleep(1)
+        TC_LogonUser, Error = Look_For("TC_LogonUser.png")
+        if Error:
+            return True
+        else:
+            pt.moveTo(TC_LogonUser)
+            pt.click()
+            sleep(0.25)
+            pyperclip.copy('NMBB5280')
+            pt.hotkey('ctrl', 'v')
+            sleep(1)
+        TC_LogonPassword, Error = Look_For("TC_LogonPassword.png")
+        if Error:
+            return True
+        else:
+            pt.moveTo(TC_LogonPassword)
+            pt.click()
+            sleep(0.25)
+            pyperclip.copy('123America#NHLS')
+            pt.hotkey('ctrl', 'v')
+            sleep(1)
+            pt.click()
+            sleep(1)
+        TC_LogonButton, Error = Look_For("TC_LogonButton.png")
+        if Error:
+            return True
+        else:
+            pt.moveTo(TC_LogonButton)
+            pt.click()
+            sleep(1)
 
     # Enter Folder number
     Fol_Num,Error = Look_For("Fol_Num.png")
@@ -506,52 +476,49 @@ def TC_Info(Fol_Num_Str):
         sleep(1)
 
     # Valid Folder Number Check and Collect personal detail
-    i = 0
-    while True:
-        TC_DropDown = pt.locateCenterOnScreen("TC_DropDown.png", confidence=.8)
-        if TC_DropDown is not None:
-            break
-        if i > 100:
-            TC_Logout()
-            incorrect_answer("Invalid_Fol_Num.txt")
-            MessageToSend = open("MessageToSend.txt", "w")
-            MessageToSend.write("Invalid Folder Number Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                + "Cell#:" + str(df.iloc[row, 0]))
-            MessageToSend.close()
-            send_message_to('MessageToSend.txt', "+27 72 895 9231","WA_BvBNum.png")
-            # send_message_to('MessageToSend.txt', "+27 82 075 8484","WA_WorkNum.png")
-            return True
-        i = i + 1
+    TC_DropDown, Error = Look_For("TC_DropDown.png")
+    if Error:
+        return True
+    else:
+        #valid
         sleep(1)
 
     #Collect Date of Birth
-    TC_DOB = pt.locateCenterOnScreen("TC_DOB.png", confidence=.8)
-    pt.moveTo(TC_DOB[0], TC_DOB[1]+40)
-    sleep(0.5)
-    pt.tripleClick()
-    sleep(0.5)
-    pt.hotkey('ctrl', 'c')
-    DOB = pyperclip.paste()
-    if '/' in DOB:
-        DOBSplit = DOB.split('/')
-        DOBFormat = DOBSplit[2].strip() + '-' + DOBSplit[1] + '-' + DOBSplit[0]
-        df.iloc[row, 5] = DOBFormat
-    else:
-        TC_Logout()
-        send_message("TC_DOB_Unavailable.txt")
-        MessageToSend = open("MessageToSend.txt", "w")
-        MessageToSend.write("No Date of Birth Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                            + "Cell#:" + str(df.iloc[row, 0]))
-        MessageToSend.close()
-        send_message_to('MessageToSend.txt', "+27 72 895 9231","WA_BvBNum.png")
-        send_message_to('MessageToSend.txt', "+27 82 075 8484","WA_WorkNum.png")
-        zero_reg()
-        df.iloc[row, 24] = "5"
+    TC_DOB, Error = Look_For("TC_DOB.png")
+    if Error:
         return True
+    else:
+        pt.moveTo(TC_DOB[0], TC_DOB[1]+40)
+        sleep(0.5)
+        pt.tripleClick()
+        sleep(0.5)
+        pt.hotkey('ctrl', 'c')
+        DOB = pyperclip.paste()
+        if '/' in DOB:
+            DOBSplit = DOB.split('/')
+            DOBFormat = DOBSplit[2].strip() + '-' + DOBSplit[1] + '-' + DOBSplit[0]
+            df.iloc[row, 5] = DOBFormat
+        else:
+            To_WA()
+            send_message("S_Details_Error.txt")
+            df.iloc[row, 24] = "2"
+            MessageToSend = open("D_MessageToSend.txt", "w")
+            MessageToSend.write("No Date of Birth Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
+                                + "Cell#:" + str(df.iloc[row, 0]))
+            MessageToSend.close()
+            send_message_to('D_MessageToSend.txt', "+27 82 075 8484", "WA_WorkNum.png")
+            send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
+            To_TC()
+            TC_Logout()
+            return True
 
     #Collect Names
-    TC_NameMarkerStart = pt.locateCenterOnScreen("TC_DropDown.png", confidence=.9)
-    TC_NameMarkerEnd = pt.locateOnScreen("TC_NameMarkerEnd.png", confidence=.9)
+    TC_NameMarkerStart, Error = Look_For("TC_DropDown.png")
+    if Error:
+        return True
+    TC_NameMarkerEnd, Error = Look_For("TC_NameMarkerEnd.png")
+    if Error:
+        return True
     pt.moveTo(TC_NameMarkerStart[0]+30, TC_NameMarkerStart[1])
     pt.mouseDown()
     pt.dragRel(TC_NameMarkerEnd[0] - TC_NameMarkerStart[0] - 30, 0, duration=1.5)
@@ -582,22 +549,11 @@ def TC_Info(Fol_Num_Str):
         sleep(1)
 
     # GXPU been conducted?
-    i = 0
-    while True:
-        TC_GXPU = pt.locateCenterOnScreen("TC_GXPU.png", confidence=.8)
-        if TC_GXPU is not None:
-            break
-        if i > 20:
-            TC_Logout()
-            incorrect_answer("No_GXPU.txt")
-            MessageToSend = open("MessageToSend.txt", "w")
-            MessageToSend.write("No GXPU Test Registered Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                + "Cell#:" + str(df.iloc[row, 0]))
-            MessageToSend.close()
-            send_message_to('MessageToSend.txt', "+27 72 895 9231","WA_BvBNum.png")
-            # send_message_to('MessageToSend.txt', "+27 82 075 8484","WA_WorkNum.png")
-            return True
-        i = i + 1
+    TC_GXPU, Error = Look_For("TC_GXPU.png")
+    if Error:
+        return True
+    else:
+        #valid
         sleep(1)
 
     # GXPU Proccesed yet?
@@ -623,42 +579,6 @@ def TC_Info(Fol_Num_Str):
     TC_Logout()
     return False
 
-def GetStatus():
-    global dt
-    global row
-    Error = False
-    i = 0
-    while True:
-        TC_Detected = pt.locateCenterOnScreen('TC_Detected.png', confidence=.8)
-        if TC_Detected is not None:
-            df.iloc[row, 9] = "1"
-            break
-        TC_Not_Detected = pt.locateCenterOnScreen('TC_Not_Detected.png', confidence=.8)
-        if TC_Not_Detected is not None:
-            df.iloc[row, 9] = "2"
-            break
-        TC_Trace = pt.locateCenterOnScreen('TC_Trace.png', confidence=.8)
-        if TC_Trace is not None:
-            df.iloc[row, 9] = "3"
-            break
-        if i > 20:
-            TC_Logout()
-            send_message("GXPU_Result_Undefined.txt")
-            MessageToSend = open("MessageToSend.txt", "w")
-            MessageToSend.write("GXPU Result Undefined Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                + "Cell#:" + str(df.iloc[row, 0]))
-            MessageToSend.close()
-            send_message_to('MessageToSend.txt', "+27 72 895 9231","WA_BvBNum.png")
-            send_message_to('MessageToSend.txt', "+27 82 075 8484","WA_WorkNum.png")
-            zero_reg()
-            df.iloc[row, 24] = "5"
-            zero_reg()
-            Error = True
-            break
-        sleep(1)
-        i = i + 1
-    return Error
-
 def GetTestDate():
     global dt
     global row
@@ -679,16 +599,54 @@ def GetTestDate():
             df.iloc[row, 8] = TestdateFormated
             break
         if i > 20:
-            TC_Logout()
-            send_message("TestDate_Undefined.txt")
-            MessageToSend = open("MessageToSend.txt", "w")
+            Error = True
+            To_WA()
+            send_message("S_Details_Error.txt")
+            df.iloc[row, 24] = "2"
+            MessageToSend = open("D_MessageToSend.txt", "w")
             MessageToSend.write("Test Date Unavailable Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                                 + "Cell#:" + str(df.iloc[row, 0]))
             MessageToSend.close()
-            send_message_to('MessageToSend.txt', "+27 72 895 9231","WA_BvBNum.png")
-            send_message_to('MessageToSend.txt', "+27 82 075 8484","WA_WorkNum.png")
-            zero_reg()
-            df.iloc[row, 24] = "5"
+            send_message_to('D_MessageToSend.txt', "+27 82 075 8484", "WA_WorkNum.png")
+            send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
+            To_TC()
+            TC_Logout()
+            break
+        sleep(1)
+        i = i + 1
+    return Error
+
+def GetStatus():
+    global dt
+    global row
+    Error = False
+    i = 0
+    while True:
+        TC_Detected = pt.locateCenterOnScreen('TC_Detected.png', confidence=.8)
+        if TC_Detected is not None:
+            df.iloc[row, 9] = "1"
+            break
+        TC_Trace = pt.locateCenterOnScreen('TC_Trace.png', confidence=.8)
+        if TC_Trace is not None:
+            df.iloc[row, 9] = "2"
+            break
+        TC_Not_Detected = pt.locateCenterOnScreen('TC_Not_Detected.png', confidence=.8)
+        if TC_Not_Detected is not None:
+            df.iloc[row, 9] = "3"
+            break
+        if i > 20:
+            To_WA()
+            send_message("S_Details_Error.txt")
+            df.iloc[row, 24] = "2"
+            MessageToSend = open("D_MessageToSend.txt", "w")
+            MessageToSend.write("GXPU Result Undefined Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
+                                + "Cell#:" + str(df.iloc[row, 0]))
+            MessageToSend.close()
+            send_message_to('D_MessageToSend.txt', "+27 82 075 8484", "WA_WorkNum.png")
+            send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
+            To_TC()
+            TC_Logout()
+            Error = True
             break
         sleep(1)
         i = i + 1
@@ -705,16 +663,26 @@ def Look_For(Image):
             break
         if i > 50:
             Error = True
-            TC_Logout()
-            send_message("TC_SysDown.txt")
-            MessageToSend = open("MessageToSend.txt", "w")
-            MessageToSend.write("TrakCare Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
+            To_WA()
+            MessageToSend = open("D_MessageToSend.txt", "w")
+            if Image == "TC_DropDown.png":
+                incorrect_answer("S_Invalid_Fol_Num.txt")
+                MessageToSend.write("Invalid Folder Number Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
+                                    + "Cell#:" + str(df.iloc[row, 0]))
+            elif Image == "TC_GXPU.png":
+                incorrect_answer("S_No_GXPU.txt")
+                MessageToSend.write("No GXPU Test Registered Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
+                                    + "Cell#:" + str(df.iloc[row, 0]))
+            else:
+                send_message("S_System_Down.txt")
+                send_message('I_Restart.txt')
+                df.iloc[row, 24] = "2"
+                MessageToSend.write("URGENT TrakCare Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                                 + "Cell#:" + str(df.iloc[row, 0]))
             MessageToSend.close()
-            send_message_to('MessageToSend.txt', "+27 72 895 9231","WA_BvBNum.png")
-            #send_message_to('MessageToSend.txt', "+27 82 075 8484","WA_WorkNum.png")
-            zero_reg()
-            df.iloc[row, 24] = "5"
+            send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
+            To_TC()
+            TC_Logout()
             break
         i = i + 1
         sleep(0.5)
@@ -734,15 +702,15 @@ def TC_Logout():
             sleep(0.25)
             pt.hotkey('enter')
             sleep(0.25)
-            pt.moveTo(150, 35)
-            pt.click()
-            sleep(1)
+            To_WA()
             break
         if i > 10:
-            pt.moveTo(150,35)
-            pt.click()
-            sleep(1)
-            send_message_to("TC_URLMarker_NotFound.txt","+27 72 895 9231","WA_BvBNum.png")
+            To_WA()
+            MessageToSend = open("D_MessageToSend.txt", "w")
+            MessageToSend.write("URGENT TC Logout Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
+                                + "Cell#:" + str(df.iloc[row, 0]))
+            MessageToSend.close()
+            send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
             break
         i = i + 1
         sleep(1)
@@ -754,28 +722,38 @@ def Look_For_GC(Image):
     i = 0
     Error = False
     while True:
-        Temp = pt.locateCenterOnScreen(Image, confidence=.8)
+        Temp = pt.locateCenterOnScreen(Image, confidence=.9)
         if Temp is not None:
             break
         if i > 50:
             Error = True
-            #go to whatsapp
-            Back_To_WA()
-            send_message("System_Down.txt")
-            MessageToSend = open("MessageToSend.txt", "w")
+            To_WA()
+            send_message("S_System_Down.txt")
+            send_message('I_Restart.txt')
+            df.iloc[row, 24] = "2"
+            MessageToSend = open("D_MessageToSend.txt", "w")
             MessageToSend.write("Google Calender Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n" + "Cell#:" + str(df.iloc[row, 0]))
             MessageToSend.close()
-            send_message_to('MessageToSend.txt', "+27 72 895 9231","WA_BvBNum.png")
-            #send_message_to('MessageToSend.txt', "+27 82 075 8484","WA_WorkNum.png")
-            zero_reg()
-            df.iloc[row, 24] = "5"
+            send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
             break
         i = i + 1
         sleep(0.5)
     return Temp,Error
 
-def Back_To_WA():
+def To_WA():
     pt.moveTo(150, 35)
+    pt.click()
+    sleep(1)
+    return
+
+def To_TC():
+    pt.moveTo(1150, 126)
+    pt.click()
+    sleep(1)
+    return
+
+def To_GC():
+    pt.moveTo(457, 42)
     pt.click()
     sleep(1)
     return
@@ -784,17 +762,11 @@ def find_available_date():
     global df
     global row
 
-    Calendar_Tab, Error = Look_For_GC("Calendar_Tab.png")
-    if Error:
-        return
-    else:
-        pt.moveTo(Calendar_Tab)
-        pt.click()
-        sleep(1)
-        pt.moveRel(0, 300)
-        sleep(0.25)
-        pt.scroll(-400)
-        sleep(0.25)
+    To_GC()
+    pt.moveRel(0, 300)
+    sleep(0.25)
+    pt.scroll(-400)
+    sleep(0.25)
 
     PosTraceRange = 14
     NegWaitRange = 3
@@ -803,24 +775,21 @@ def find_available_date():
     now_test_diff = int((now_date_obj - test_date_obj).days)
 
     # get profile none limits
-    if str(df.iloc[row, 9]) == "1" or str(df.iloc[row, 9]) == "3": #pos and trace
-        none_limit = (PosTraceRange - 1) - now_test_diff
-
-    elif str(df.iloc[row, 9]) == "2" or str(df.iloc[row, 9]) == "4": #Neg or Waiting
-        none_limit = (NegWaitRange - 1) - now_test_diff
-
+    if str(df.iloc[row, 9]) == "1" or str(df.iloc[row, 9]) == "2": #pos and trace
+        none_limit = PosTraceRange - now_test_diff
+    elif str(df.iloc[row, 9]) == "3" or str(df.iloc[row, 9]) == "4": #Neg or Waiting
+        none_limit = NegWaitRange - now_test_diff
     else:
         none_limit = 0
 
     if none_limit < 1:
-        Back_To_WA()
-        send_message('TestDate_OutOfRange.txt')
-        df.iloc[row, 24] = "3"
+        To_WA()
+        send_message('S_None_Available.txt')
+        df.iloc[row, 24] = "2"
         # if they were waiting for the results encourage restart if postive
         if str(df.iloc[row, 9]) == "4":
-            Back_To_WA()
-            send_message('Waiting_Restart.txt')
-            df.iloc[row, 24] = "3"
+            To_WA()
+            send_message('S_Waiting_Restart.txt')
         return
 
     #reset options if you ask for more dates *beyond* your limit
@@ -857,136 +826,160 @@ def find_available_date():
                 n = n + 1
 
             OptionAvialable = "0"
-            filelink = open("Temp_Options.txt", "w")
-            filelink.write("*English:*" + "\n" + "Please select a time slot that suits you." + "\n" + "\n")
-            filelink.write("*Xhosa:*" + "\n" + "Nceda ukhethe ixesha elizokulungela." + "\n" + "\n")
-            filelink.write("*Afrikaans:*" + "\n" + "Kies n tydgleuf wat u pas." + "\n"+ "\n")
-            filelink.write("Date: *" + str(option_date_obj.date()) + "*" + "\n")
-            filelink.write("*0*" + " - _More Options_" + "\n")
+            txt = open('S_Options.txt', 'r', encoding='utf-8-sig')
+            temp = txt.read()
+            txt.close()
+            MessageToSend = open("D_MessageToSend.txt", "w")
+            MessageToSend.write(str(temp) + "\n" + "\n" + "Date: *" + str(option_date_obj.date()) + "*" + "\n")
+            MessageToSend.write("*0*" + " - _More Options_" + "\n")
             if pt.pixelMatchesColor(int(x + 100), int(y + 225), (255, 255, 255), tolerance=5):
                 #SAVE 8:30 AS AN OPTION
-                filelink.write("*1*" + " - @ 8:15" + "\n")
+                MessageToSend.write("*1*" + " - @ 8:15" + "\n")
                 df.iloc[row, 12] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*1*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*1*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 12] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 257), (255, 255, 255), tolerance=5):
                 # SAVE 9:30 AS AN OPTION
-                filelink.write("*2*" + " - @ 9:00" + "\n")
+                MessageToSend.write("*2*" + " - @ 9:00" + "\n")
                 df.iloc[row, 13] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*2*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*2*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 13] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 289), (255, 255, 255), tolerance=5):
                 # SAVE 10:30 AS AN OPTIOn
-                filelink.write("*3*" + " - @ 9:45" + "\n")
+                MessageToSend.write("*3*" + " - @ 9:45" + "\n")
                 df.iloc[row, 14] = "1"
             else:
-                filelink.write("*3*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*3*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 14] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 321), (255, 255, 255), tolerance=5):
                 # SAVE 11:30 AS AN OPTION
-                filelink.write("*4*" + " - @ 10:30" + "\n")
+                MessageToSend.write("*4*" + " - @ 10:30" + "\n")
                 df.iloc[row, 15] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*4*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*4*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 15] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 353), (255, 255, 255), tolerance=5):
                 # SAVE 13:30 AS AN OPTION
-                filelink.write("*5*" + " - @ 11:15" + "\n")
+                MessageToSend.write("*5*" + " - @ 11:15" + "\n")
                 df.iloc[row, 16] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*5*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*5*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 16] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 430), (255, 255, 255), tolerance=5):
                 # SAVE 14:30 AS AN OPTION
-                filelink.write("*6*" + " - @ 13:00" + "\n")
+                MessageToSend.write("*6*" + " - @ 13:00" + "\n")
                 df.iloc[row, 17] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*6*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*6*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 17] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 462), (255, 255, 255), tolerance=5):
                 # SAVE 15:30 AS AN OPTION
-                filelink.write("*7*" + " - @ 13:45" + "\n")
+                MessageToSend.write("*7*" + " - @ 13:45" + "\n")
                 df.iloc[row, 18] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*7*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*7*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 18] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 494), (255, 255, 255), tolerance=5):
                 # SAVE 14:30 AS AN OPTION
-                filelink.write("*8*" + " - @ 14:30" + "\n")
+                MessageToSend.write("*8*" + " - @ 14:30" + "\n")
                 df.iloc[row, 19] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*8*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*8*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 19] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 526), (255, 255, 255), tolerance=5):
                 # SAVE 15:30 AS AN OPTION
-                filelink.write("*9*" + " - @ 15:15" + "\n")
+                MessageToSend.write("*9*" + " - @ 15:15" + "\n")
                 df.iloc[row, 20] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*9*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*9*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 20] = "0"
             if pt.pixelMatchesColor(int(x + 100), int(y + 558), (255, 255, 255), tolerance=5):
                 # SAVE 15:30 AS AN OPTION
-                filelink.write("*10*" + " - @ 16:00" + "\n")
+                MessageToSend.write("*10*" + " - @ 16:00" + "\n")
                 df.iloc[row, 21] = "1"
                 OptionAvialable = "1"
             else:
-                filelink.write("*10*" + " - _Booked Out_" + "\n")
+                MessageToSend.write("*10*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 21] = "0"
 
-            filelink.write("*11*" + " - _Restart Options_" + "\n")
-            filelink.write("*12*" + " - _Cancel Appointment_" + "\n")
-            filelink.close()
+            MessageToSend.write("*11*" + " - _Restart Options_" + "\n")
+            MessageToSend.write("*12*" + " - _Cancel Appointment_" + "\n")
+            MessageToSend.close()
 
             if OptionAvialable == "0":
                 #no available options
                 df.iloc[row, 10] = int(str(df.iloc[row, 10])) + 1
             else:
                 #send available options
-                Back_To_WA()
-                send_message('Temp_Options.txt')
+                To_WA()
+                send_message('D_MessageToSend.txt')
                 #OPtion date
-                df.iloc[row, 22] = now_date_obj
+                df.iloc[row, 22] = str(option_date_obj)
                 return
-    Back_To_WA()
+    To_WA()
     send_message('S_None_Available.txt')
-    df.iloc[row, 24] = "3"
-    if str(df.iloc[row, 9]) == "3":
-        send_message('Waiting_Restart.txt')
+    df.iloc[row, 24] = "2"
+    if str(df.iloc[row, 9]) == "4":
+        send_message('S_Waiting_Restart.txt')
     return
 
 def check_selection(selected):
     global df
     global row
 
+    Calendar_Tab, Error = Look_For_GC("Calendar_Tab.png")
+    if Error:
+        return
+    else:
+        pt.moveTo(Calendar_Tab)
+        pt.click()
+        sleep(1)
+        pt.moveRel(0, 300)
+        sleep(0.25)
+        pt.scroll(-400)
+        sleep(0.25)
+
     opt_date_obj = datetime.strptime(str(df.iloc[row, 22]), '%Y-%m-%d')
     now_date_obj = datetime.strptime(str(datetime.now().date()), '%Y-%m-%d')
     opt_now_diff = int((opt_date_obj - now_date_obj).days)
 
+    match = FolderNum_Match(str(df.iloc[row, 4]))
+    if match:
+        incorrect_answer('S_Used_FolNum.txt')
+        return
+
     if int(opt_now_diff) <= 0:
-        Back_To_WA()
-        send_message('S_Date_Passed.txt',)
+        To_WA()
+        send_message('S_No_longer_Ava.txt',)
         df.iloc[row, 11] = "1"
         find_available_date()
         return
 
-    Today = pt.locateCenterOnScreen("Today.png", confidence=.7)
-    pt.moveTo(Today)
-    pt.click()
-    sleep(1)
+    Today, Error = Look_For_GC("Today.png")
+    if Error:
+        return
+    else:
+        pt.moveTo(Today)
+        pt.click()
+        sleep(1)
 
-    Arrows = pt.locateCenterOnScreen("Arrows.png", confidence=.7)
-    x = Arrows[0]
-    y = Arrows[1]
+    Arrows, Error = Look_For_GC("Arrows.png")
+    if Error:
+        return
+    else:
+        x = Arrows[0]
+        y = Arrows[1]
+
     n = 0
     while n < opt_now_diff:
         pt.moveTo(x + 12, y, duration=.05)
@@ -998,83 +991,83 @@ def check_selection(selected):
         if pt.pixelMatchesColor(int(x + 100), int(y + 270), (255, 255, 255), tolerance=5):
             BookingPrep('8:15')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 2:
         if pt.pixelMatchesColor(int(x + 100), int(y + 294), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('9:00')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 3:
         if pt.pixelMatchesColor(int(x + 100), int(y + 318), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('9:45')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 4:
         if pt.pixelMatchesColor(int(x + 100), int(y + 342), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('10:30')
         else:
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 5:
         if pt.pixelMatchesColor(int(x + 100), int(y + 390), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('11:15')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 6:
         if pt.pixelMatchesColor(int(x + 100), int(y + 414), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('13:00')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 7:
         if pt.pixelMatchesColor(int(x + 100), int(y + 438), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('13:45')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 8:
         if pt.pixelMatchesColor(int(x + 100), int(y + 438), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('14:30')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 9:
         if pt.pixelMatchesColor(int(x + 100), int(y + 438), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('15:15')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 10:
         if pt.pixelMatchesColor(int(x + 100), int(y + 438), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
+            BookingPrep('16:00')
         else:
-            Back_To_WA()
+            To_WA()
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     else:
-        Back_To_WA()
+        To_WA()
         send_message('S_Not_Option.txt')
         df.iloc[row, 8] = "1"
         find_available_date()
@@ -1083,6 +1076,7 @@ def check_selection(selected):
 def BookingPrep(Time):
     global df
     global row
+
     GC_Booking, Error = Look_For_GC("GC_Booking.png")
     if Error:
         return
@@ -1119,22 +1113,22 @@ def BookingPrep(Time):
         pt.click()
         sleep(1)
 
-    Back_To_WA()
-    filelink = open("Slot_Ava_Booked.txt", "w")
-    filelink.write("*English:*" + "\n" + "Your appointment has been booked successfully" + "\n"+ "\n")
-    filelink.write("*Xhosa:*" + "\n" + "Uzokwazi ukubayinxalenye yophando ixesha sele ulibekelwe." + "\n" + "\n")
-    filelink.write("*Afrikaans:*" + "\n" + "U afspraak is suksesvol bespreek" + "\n" + "\n")
-    filelink.write("Date: *" + str(df.iloc[row, 22]) + "*" + "\n" + "Time: " + Time)
-    filelink.close()
-    send_message('Slot_Ava_Booked.txt')
+    To_WA()
+    txt = open('S_Available_Booked.txt', 'r', encoding='utf-8-sig')
+    temp = txt.read()
+    txt.close()
+    MessageToSend = open("D_MessageToSend.txt", "w")
+    MessageToSend.write(str(temp) + "\n" + "\n" + "Date: *" + str(df.iloc[row, 22]) + "*" + "\n" + "Time: " + Time)
+    MessageToSend.close()
+    send_message('D_MessageToSend.txt')
     df.iloc[row, 24] = "1"
     df.iloc[row, 23] = Time
     send_map()
-    send_message('S_Ticket_Warning.txt')
+    send_message('I_Ticket_Warning.txt')
     return
 
 def send_map():
-    txt = open('S_Directions.txt' 'r')
+    txt = open('I_Directions.txt', 'r', encoding='utf-8-sig')
     temp = txt.read()
     txt.close()
     pyperclip.copy(temp)
@@ -1156,6 +1150,19 @@ def send_map():
     pt.hotkey('ctrl', 'v')
     pt.typewrite("\n", interval=0.01)
     return
+
+def FolderNum_Match(Folder_num):
+    global df
+    global row
+    i = len(df)
+    match = False
+    while i > 0:  # Find matching numbers
+        if str(df.iloc[i - 1, 4]) == str(Folder_num) and str(df.iloc[i - 1, 24]) == '1':
+            match = True
+            break  # only latest of interest, save time
+        i = i - 1
+
+    return match
 
 check_for_new_message()
 

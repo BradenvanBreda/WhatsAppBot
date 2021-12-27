@@ -1,0 +1,8 @@
+﻿_English_
+From your medical records we see you are still waiting for your TB test result from the clinic. If that test ends up being TB-Positive, then please rescreen, because there are available bookings for confirmed TB-Positive patients.
+
+_Xhosa_
+Ngokwengxelo zakho zonyango siyabona ukuba usalinde iziphumo zovavanyo lwakho lwe-TB ekliniki. Ukuba olo vavanyo luphele une-TB, nceda uqhakamshelane nathi, kuba kukho ubhukisho olukhoyo lwezigulane eziqinisekisiweyo ezine-TB.
+
+_Afrikaans_
+Uit jou mediese rekords sien ons jy wag nog vir jou TB-toetsuitslag van die kliniek. As daardie toets uiteindelik TB-positief is, probeer asseblief weer, want daar is besprekings beskikbaar vir bevestigde TB-positiewe pasiënte.

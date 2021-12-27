@@ -1,0 +1,8 @@
+﻿_English_
+Is the date above your birth date?
+
+_Xhosa_
+Ngulo mhla ungentla umhla wokuzalwa kwakho?
+
+_Afrikaans_
+Is die datum bo jou geboortedatum?

@@ -1,0 +1,8 @@
+﻿_English_
+Unfortunately, the automatic system was not able to get all the information required from your medical records. Instead, you will be contacted by an AI DIAGNOSTICS consultant telephonically to complete the study eligibility screening.
+
+_Xhosa_
+Ngelishwa inkqubo ezenzekelayo ayikwazanga ukufumana lonke ulwazi olufunekayo kwiirekhodi zakho zonyango. Endaweni yoko, uya kuqhakamshelwana nomcebisi we-AI DIAGNOSTICS ngomnxeba ukuze ugqibezele ukufaneleka kophando.
+
+_Afrikaans_
+Ongelukkig kon die outomatiese stelsel nie al die nodige inligting van jou mediese rekords kry nie. In plaas daarvan sal jy telefonies deur 'n AI DIAGNOSTICS konsultant gekontak word om die studiekwalifikasiekeuring te voltooi.

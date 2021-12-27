@@ -1,0 +1,8 @@
+﻿_English_
+There is no health record for the “Folder Number” provided. When you rescreen please make sure to input your “Folder Number” correctly.
+
+_Xhosa_
+Akukho rekhodi yempilo yenombolo ye-“Folder Number” enikiweyo. Xa uphinda usikrina nceda uqiniseke ukuba ufake inombolo ye-“Folder Number” ngokuchanekileyo.
+
+_Afrikaans_
+Daar is geen mediese rekords vir die “Folder Number” wat u gegee het nie. Probeer weer en maak asseblief seker dat jou “Folder Number” korrek ingetik is.

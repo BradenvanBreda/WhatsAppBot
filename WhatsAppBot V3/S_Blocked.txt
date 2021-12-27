@@ -1,0 +1,8 @@
+﻿_English_
+You have entered an invalid "Folder Number" more than 3 times. This number has now been blocked.
+
+_Xhosa_
+Ufake inombolo engasebenziyo ye-“Folder Number” ngaphezu kwamatyeli amathathu-3. Le nombolo ivaliwe ngoku.
+
+_Afrikaans_
+Jy het 'n ongeldige "Folder Number" meer as 3 keer ingetik. Hierdie nommer is nou geblok.

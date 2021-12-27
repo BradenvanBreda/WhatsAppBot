@@ -1,0 +1,8 @@
+﻿_English_
+Unfortunately, you have to consent to the screening questions and allow AI DIAGNOSTICS permission to view your TB test results if you want to join the study.
+
+_Xhosa_
+Ngelishwa, kuyakufuneka uvume kwimibuzo yokuhlolwa kwaye uvumele imvume ye-AI DIAGNOSTICS ukujonga iziphumo zakho ze-TB ukuba ufuna ukujoyina.
+
+_Afrikaans_
+Ongelukkig moet jy instem tot die siftingsvrae en AI DIAGNOSTICS toestemming gee om jou TB-toetsresultate te sien as jy by die studie wil aansluit.
