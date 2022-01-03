@@ -1,8 +1,17 @@
 ﻿_English_
 Is the date above your birth date?
+_Answer with only a *1* or *2*:_
+*1* - Yes
+*2* - No
 
 _Xhosa_
 Ngulo mhla ungentla umhla wokuzalwa kwakho?
+_Phendula kuphela ngo *1* okanye u *2*:_
+*1* - Ewe
+*2* - Hayi
 
 _Afrikaans_
 Is die datum bo jou geboortedatum?
+_Antwoord slegs met 'n *1* of *2*:_
+*1* - Ja
+*2* - Nee

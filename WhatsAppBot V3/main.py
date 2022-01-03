@@ -23,6 +23,7 @@ def check_for_new_message():
         if green_dot is not None:
             pt.moveTo(green_dot)
             pt.moveRel(-100, 0)
+            sleep(0.5)
             pt.click()
             sleep(1)
             get_phone_num()
@@ -30,11 +31,14 @@ def check_for_new_message():
 def get_phone_num():
     global df
     global row
-    Mag_dots = pt.locateCenterOnScreen("mag_dots.png", confidence=.7)
-    pt.moveTo(Mag_dots)
-    pt.moveRel(-200, 10)
-    pt.click()
     sleep(1)
+    Mag_dots = pt.locateCenterOnScreen("mag_dots.png", confidence=.7)
+    x = Mag_dots[0]
+    y = Mag_dots[1]
+    pt.moveTo(x - 200, y + 10)
+    sleep(0.5)
+    pt.click()
+    sleep(2)
     Business_acc = pt.locateOnScreen("Business_acc.png", confidence=.7)
     if Business_acc is not None:
         pt.moveTo(Business_acc)
@@ -43,24 +47,27 @@ def get_phone_num():
         if Busi_Number is not None:
             pt.moveTo(Busi_Number)
             pt.moveRel(0, -35)
+            sleep(0.5)
             pt.tripleClick()
-            sleep(0.25)
+            sleep(0.5)
             pt.hotkey('ctrl', 'c')
         else:
             return
     else:
         Number = pt.locateCenterOnScreen("Number.png", confidence=.7)
         pt.moveTo(Number)
+        sleep(0.5)
         pt.tripleClick()
-        sleep(0.25)
+        sleep(0.5)
         pt.hotkey('ctrl', 'c')
 
     phone_num = pyperclip.paste()
 
     Close = pt.locateCenterOnScreen("Close.png", confidence=.8)
     pt.moveTo(Close)
+    sleep(0.5)
     pt.click()
-    sleep(0.25)
+    sleep(0.5)
     df.to_csv("D_auto_backup.txt", index=False)
 
     i = len(df)
@@ -264,27 +271,32 @@ def zero_reg():
     return
 
 def get_message():
+    sleep(1)
+    Paperclip = pt.locateCenterOnScreen("Paperclip.png", confidence=.6)
+    x = Paperclip[0]
+    y = Paperclip[1]
+    pt.moveTo(x - 20, y - 55)
     sleep(0.5)
-    Paperclip = pt.locateOnScreen("Paperclip.png", confidence=.6)
-    pt.moveTo(Paperclip)
-    pt.moveRel(-20, -55)
     pt.tripleClick()
-    sleep(0.25)
+    sleep(0.5)
     pt.hotkey('ctrl', 'c')
     return
 
 def send_message(message_path):
+    sleep(0.5)
     txt = open(message_path, 'r',  encoding='utf-8-sig')
     temp = txt.read()
     txt.close()
     pyperclip.copy(temp)
-    Paperclip = pt.locateOnScreen("Paperclip.png", confidence=.6)
-    pt.moveTo(Paperclip)
-    pt.moveRel(130, 0)
+    Paperclip = pt.locateCenterOnScreen("Paperclip.png", confidence=.6)
+    x = Paperclip[0]
+    y = Paperclip[1]
+    pt.moveTo(x + 130, y)
+    sleep(0.5)
     pt.click()
-    sleep(0.25)
+    sleep(0.5)
     pt.hotkey('ctrl', 'v')
-    sleep(0.25)
+    sleep(0.5)
     pt.hotkey('enter')
     return
 
@@ -292,8 +304,9 @@ def send_message_to(message_path,CellNum,CellImage):
     sleep(1)
     WA_SearchNum = pt.locateCenterOnScreen("WA_SearchNum.png", confidence=.9)
     pt.moveTo(WA_SearchNum)
+    sleep(0.5)
     pt.click()
-    sleep(0.25)
+    sleep(0.5)
     pyperclip.copy(CellNum)
     pt.hotkey('ctrl', 'v')
     i = 0
@@ -302,8 +315,9 @@ def send_message_to(message_path,CellNum,CellImage):
         WA_Who = pt.locateCenterOnScreen(CellImage, confidence=.9)
         if WA_Who is not None:
             pt.moveTo(WA_Who)
+            sleep(0.5)
             pt.click()
-            sleep(0.25)
+            sleep(0.5)
             send_message(message_path)
             break
         if i > 10:
@@ -319,19 +333,23 @@ def ask_for_ticket():
     pyperclip.copy(temp)
     paperclip = pt.locateCenterOnScreen("paperclip.png", confidence=.8)
     pt.moveTo(paperclip)
+    sleep(0.5)
     pt.click()
     sleep(1)
     pt.moveRel(0, -70)
+    sleep(0.5)
     pt.click()
     sleep(3)
     Ticket_Example = pt.locateCenterOnScreen("Ticket_Example.png", confidence=.7)
     pt.moveTo(Ticket_Example)
+    sleep(0.5)
     pt.doubleClick()
     sleep(2)
     Add_Caption = pt.locateOnScreen("caption.png", confidence=.7)
     pt.moveTo(Add_Caption)
+    sleep(0.5)
     pt.click()
-    sleep(0.25)
+    sleep(0.5)
     pt.hotkey('ctrl', 'v')
     pt.typewrite("\n", interval=0.01)
     return
@@ -343,19 +361,23 @@ def ask_for_folder_num():
     pyperclip.copy(temp)
     paperclip = pt.locateCenterOnScreen("paperclip.png", confidence=.8)
     pt.moveTo(paperclip)
+    sleep(0.5)
     pt.click()
     sleep(1)
     pt.moveRel(0, -70)
+    sleep(0.5)
     pt.click()
     sleep(3)
     Folder_Number = pt.locateCenterOnScreen("Folder_Number.png", confidence=.7)
     pt.moveTo(Folder_Number)
+    sleep(0.5)
     pt.doubleClick()
     sleep(2)
     Caption = pt.locateOnScreen("caption.png", confidence=.7)
     pt.moveTo(Caption)
+    sleep(0.5)
     pt.click()
-    sleep(0.25)
+    sleep(0.5)
     pt.hotkey('ctrl', 'v')
     pt.typewrite("\n", interval=0.01)
     return
@@ -392,8 +414,9 @@ def TC_Info(Fol_Num_Str):
             return True
         else:
             pt.moveTo(TC_LogonUser)
+            sleep(0.5)
             pt.click()
-            sleep(0.25)
+            sleep(0.5)
             pyperclip.copy('NMBB5280')
             pt.hotkey('ctrl', 'v')
             sleep(1)
@@ -402,8 +425,9 @@ def TC_Info(Fol_Num_Str):
             return True
         else:
             pt.moveTo(TC_LogonPassword)
+            sleep(0.5)
             pt.click()
-            sleep(0.25)
+            sleep(0.5)
             pyperclip.copy('123America#NHLS')
             pt.hotkey('ctrl', 'v')
             sleep(1)
@@ -414,6 +438,7 @@ def TC_Info(Fol_Num_Str):
             return True
         else:
             pt.moveTo(TC_LogonButton)
+            sleep(0.5)
             pt.click()
             sleep(1)
 
@@ -423,6 +448,7 @@ def TC_Info(Fol_Num_Str):
         return True
     else:
         pt.moveTo(Fol_Num)
+        sleep(0.5)
         pt.click()
         pyperclip.copy(Fol_Num_Str)
         pt.hotkey('ctrl', 'v')
@@ -434,6 +460,7 @@ def TC_Info(Fol_Num_Str):
         return True
     else:
         pt.moveTo(TC_Advanced)
+        sleep(0.5)
         pt.click()
         sleep(1)
 
@@ -443,6 +470,7 @@ def TC_Info(Fol_Num_Str):
         return True
     else:
         pt.moveTo(TC_Location)
+        sleep(0.5)
         pt.click()
         pyperclip.copy('P9')
         pt.hotkey('ctrl', 'v')
@@ -454,6 +482,7 @@ def TC_Info(Fol_Num_Str):
         return True
     else:
         pt.moveTo(TC_WC)
+        sleep(0.5)
         pt.click()
         sleep(1)
 
@@ -463,6 +492,7 @@ def TC_Info(Fol_Num_Str):
         return True
     else:
         pt.moveTo(TC_Advanced)
+        sleep(0.5)
         pt.click()
         sleep(1)
 
@@ -472,6 +502,7 @@ def TC_Info(Fol_Num_Str):
         return True
     else:
         pt.moveTo(TC_Search)
+        sleep(0.5)
         pt.click()
         sleep(1)
 
@@ -521,7 +552,7 @@ def TC_Info(Fol_Num_Str):
         return True
     pt.moveTo(TC_NameMarkerStart[0]+30, TC_NameMarkerStart[1])
     pt.mouseDown()
-    pt.dragRel(TC_NameMarkerEnd[0] - TC_NameMarkerStart[0] - 30, 0, duration=1.5)
+    pt.dragRel(TC_NameMarkerEnd[0] - TC_NameMarkerStart[0] - 60, 0, duration=1.5)
     sleep(1)
     pt.mouseUp()
     pt.hotkey('ctrl', 'c')
@@ -545,6 +576,7 @@ def TC_Info(Fol_Num_Str):
     else:
         pt.moveTo(TC_DropDown)
         pt.moveRel(-15, 0)
+        sleep(0.5)
         pt.click()
         sleep(1)
 
@@ -558,6 +590,7 @@ def TC_Info(Fol_Num_Str):
 
     # GXPU Proccesed yet?
     pt.moveTo(TC_GXPU)
+    sleep(0.5)
     pt.click()
     i = 0
     while True:
@@ -570,7 +603,7 @@ def TC_Info(Fol_Num_Str):
             if Error:
                 return True
             break
-        if i > 30: #GXPU Not yet processed
+        if i > 15: #GXPU Not yet processed
             df.iloc[row, 8] = str(datetime.now().date())
             df.iloc[row, 9] = "4"
             break
@@ -588,7 +621,7 @@ def GetTestDate():
         TC_TestDate = pt.locateCenterOnScreen('TC_TestDate.png', confidence=.8)
         if TC_TestDate is not None:
             pt.moveTo(TC_TestDate)
-            pt.moveRel(70, 0)
+            pt.moveRel(77, 0)
             sleep(0.5)
             pt.tripleClick()
             sleep(0.5)
@@ -661,7 +694,7 @@ def Look_For(Image):
         Temp = pt.locateCenterOnScreen(Image, confidence=.8)
         if Temp is not None:
             break
-        if i > 50:
+        if i > 30:
             Error = True
             To_WA()
             MessageToSend = open("D_MessageToSend.txt", "w")
@@ -695,13 +728,14 @@ def TC_Logout():
         if TC_URLMarker is not None:
             pt.moveTo(TC_URLMarker)
             pt.moveRel(200, 15)
+            sleep(0.5)
             pt.tripleClick()
             pyperclip.copy('https://trakcarelabwebview.nhls.ac.za/trakcarelab/csp/system.Home.cls#/Logout')
-            sleep(0.25)
+            sleep(0.5)
             pt.hotkey('ctrl', 'v')
-            sleep(0.25)
+            sleep(0.5)
             pt.hotkey('enter')
-            sleep(0.25)
+            sleep(0.5)
             To_WA()
             break
         if i > 10:
@@ -742,18 +776,21 @@ def Look_For_GC(Image):
 
 def To_WA():
     pt.moveTo(150, 35)
+    sleep(0.5)
     pt.click()
     sleep(1)
     return
 
 def To_TC():
     pt.moveTo(1150, 126)
+    sleep(0.5)
     pt.click()
     sleep(1)
     return
 
 def To_GC():
     pt.moveTo(457, 42)
+    sleep(0.5)
     pt.click()
     sleep(1)
     return
@@ -764,9 +801,9 @@ def find_available_date():
 
     To_GC()
     pt.moveRel(0, 300)
-    sleep(0.25)
+    sleep(0.5)
     pt.scroll(-400)
-    sleep(0.25)
+    sleep(0.5)
 
     PosTraceRange = 14
     NegWaitRange = 3
@@ -793,15 +830,15 @@ def find_available_date():
         return
 
     #reset options if you ask for more dates *beyond* your limit
-    if int(str(df.iloc[row, 10])) > none_limit:
-        df.iloc[row, 10] = 1
+    if int(str(df.iloc[row, 11])) > none_limit:
+        df.iloc[row, 11] = 1
 
-    while int(str(df.iloc[row, 10])) <= none_limit:
-        option_date_obj = now_date_obj + timedelta(days=int(str(df.iloc[row, 10])))
+    while int(str(df.iloc[row, 11])) <= none_limit:
+        option_date_obj = now_date_obj + timedelta(days=int(str(df.iloc[row, 11])))
         if option_date_obj.weekday() == 5:
-            df.iloc[row, 10] = int(str(df.iloc[row, 10])) + 2
+            df.iloc[row, 11] = int(str(df.iloc[row, 11])) + 2
         elif option_date_obj.weekday() == 6:
-            df.iloc[row, 10] = int(str(df.iloc[row, 10])) + 1
+            df.iloc[row, 11] = int(str(df.iloc[row, 11])) + 1
         else:
             #Using number of nones jog to correct day in calendar.
             Today, Error = Look_For_GC("Today.png")
@@ -809,6 +846,7 @@ def find_available_date():
                 return
             else:
                 pt.moveTo(Today)
+                sleep(0.5)
                 pt.click()
                 sleep(1)
 
@@ -819,8 +857,9 @@ def find_available_date():
                 x = Arrows[0]
                 y = Arrows[1]
             n = 0
-            while n < int(str(df.iloc[row, 10])):
+            while n < int(str(df.iloc[row, 11])):
                 pt.moveTo(x + 12, y, duration=.05)
+                sleep(0.5)
                 pt.click()
                 sleep(1)
                 n = n + 1
@@ -918,13 +957,13 @@ def find_available_date():
 
             if OptionAvialable == "0":
                 #no available options
-                df.iloc[row, 10] = int(str(df.iloc[row, 10])) + 1
+                df.iloc[row, 11] = str(int(str(df.iloc[row, 11])) + 1)
             else:
                 #send available options
                 To_WA()
                 send_message('D_MessageToSend.txt')
                 #OPtion date
-                df.iloc[row, 22] = str(option_date_obj)
+                df.iloc[row, 22] = str(option_date_obj.date())
                 return
     To_WA()
     send_message('S_None_Available.txt')
@@ -942,12 +981,13 @@ def check_selection(selected):
         return
     else:
         pt.moveTo(Calendar_Tab)
+        sleep(0.5)
         pt.click()
         sleep(1)
         pt.moveRel(0, 300)
-        sleep(0.25)
+        sleep(0.5)
         pt.scroll(-400)
-        sleep(0.25)
+        sleep(0.5)
 
     opt_date_obj = datetime.strptime(str(df.iloc[row, 22]), '%Y-%m-%d')
     now_date_obj = datetime.strptime(str(datetime.now().date()), '%Y-%m-%d')
@@ -970,6 +1010,7 @@ def check_selection(selected):
         return
     else:
         pt.moveTo(Today)
+        sleep(0.5)
         pt.click()
         sleep(1)
 
@@ -983,12 +1024,14 @@ def check_selection(selected):
     n = 0
     while n < opt_now_diff:
         pt.moveTo(x + 12, y, duration=.05)
+        sleep(0.5)
         pt.click()
         sleep(1)
         n = n + 1
 
     if selected == 1:
         if pt.pixelMatchesColor(int(x + 100), int(y + 270), (255, 255, 255), tolerance=5):
+            print('SENT')
             BookingPrep('8:15')
         else:
             To_WA()
@@ -1077,26 +1120,36 @@ def BookingPrep(Time):
     global df
     global row
 
-    GC_Booking, Error = Look_For_GC("GC_Booking.png")
+    Today, Error = Look_For_GC("Today.png")
     if Error:
         return
     else:
-        pt.moveTo(GC_Booking)
+        x = Today[0]
+        y = Today[1]
+        pt.moveTo(x, y + 154)
+        sleep(0.5)
         pt.click()
         sleep(1)
 
-    GC_TimeMarker, Error = Look_For_GC("GC_TimeMarker.png")
+    GC_Add_Title, Error = Look_For_GC("GC_Add_Title.png")
     if Error:
         return
     else:
-        pt.moveTo(GC_TimeMarker)
-        pt.moveRel(0, -45)
+        pt.moveTo(GC_Add_Title)
+        sleep(0.5)
         pt.click()
         pyperclip.copy(str(df.iloc[row, 9]) + " " + str(df.iloc[row, 0]) + " " + str(df.iloc[row, 6]) + " " + str(df.iloc[row, 7]) + " " + str(df.iloc[row, 4]))
         pt.hotkey('ctrl', 'v')
         sleep(0.5)
-        pt.moveTo(GC_TimeMarker)
-        pt.moveRel(-5, 40)
+
+    GC_Time, Error = Look_For_GC("GC_Time.png")
+    if Error:
+        return
+    else:
+        x = GC_Time[0]
+        y = GC_Time[1]
+        pt.moveTo(x - 20, y)
+        sleep(1)
         pt.click()
         sleep(1)
         pyperclip.copy(Time)
@@ -1110,6 +1163,7 @@ def BookingPrep(Time):
         return
     else:
         pt.moveTo(save)
+        sleep(0.5)
         pt.click()
         sleep(1)
 
@@ -1134,19 +1188,23 @@ def send_map():
     pyperclip.copy(temp)
     paperclip = pt.locateCenterOnScreen("paperclip.png", confidence=.8)
     pt.moveTo(paperclip)
+    sleep(0.5)
     pt.click()
     sleep(1)
     pt.moveRel(0, -70)
+    sleep(0.5)
     pt.click()
     sleep(3)
     Ticket_Example = pt.locateCenterOnScreen("map.png", confidence=.7)
     pt.moveTo(Ticket_Example)
+    sleep(0.5)
     pt.doubleClick()
     sleep(2)
     Add_Caption = pt.locateOnScreen("caption.png", confidence=.7)
     pt.moveTo(Add_Caption)
+    sleep(0.5)
     pt.click()
-    sleep(0.25)
+    sleep(0.5)
     pt.hotkey('ctrl', 'v')
     pt.typewrite("\n", interval=0.01)
     return

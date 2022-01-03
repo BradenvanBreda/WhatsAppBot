@@ -11,11 +11,7 @@ sleep(2)
 #pending 174068668
 
 def calculate_age():
-    Temp = pt.locateCenterOnScreen('TC_NameMarkerEnd.png', confidence=.8)
-    pt.moveTo(Temp)
-
-
-
+    print(pt.position())
 
 calculate_age()
 
