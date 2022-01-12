@@ -11,7 +11,9 @@ sleep(2)
 #pending 174068668
 
 def calculate_age():
-    print(pt.position())
+    while True:
+        print(pt.position())
+        sleep(1)
 
 calculate_age()
 

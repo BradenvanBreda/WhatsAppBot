@@ -6,7 +6,7 @@ from datetime import datetime
 from datetime import timedelta
 import pyperclip
 import pandas
-sleep(10)
+sleep(5)
 
 def check_for_new_message():
     global df
@@ -800,10 +800,6 @@ def find_available_date():
     global row
 
     To_GC()
-    pt.moveRel(0, 300)
-    sleep(0.5)
-    pt.scroll(-400)
-    sleep(0.5)
 
     PosTraceRange = 14
     NegWaitRange = 3
@@ -871,15 +867,19 @@ def find_available_date():
             MessageToSend = open("D_MessageToSend.txt", "w")
             MessageToSend.write(str(temp) + "\n" + "\n" + "Date: *" + str(option_date_obj.date()) + "*" + "\n")
             MessageToSend.write("*0*" + " - _More Options_" + "\n")
-            if pt.pixelMatchesColor(int(x + 100), int(y + 225), (255, 255, 255), tolerance=5):
-                #SAVE 8:30 AS AN OPTION
+            #Scroll Up
+            pt.moveRel(0, 300)
+            sleep(2)
+            pt.scroll(400)
+            sleep(2)
+            if pt.pixelMatchesColor(int(x + 400), int(y + 475), (255, 255, 255), tolerance=5):
                 MessageToSend.write("*1*" + " - @ 8:15" + "\n")
                 df.iloc[row, 12] = "1"
                 OptionAvialable = "1"
             else:
                 MessageToSend.write("*1*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 12] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 257), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 508), (255, 255, 255), tolerance=5):
                 # SAVE 9:30 AS AN OPTION
                 MessageToSend.write("*2*" + " - @ 9:00" + "\n")
                 df.iloc[row, 13] = "1"
@@ -887,14 +887,14 @@ def find_available_date():
             else:
                 MessageToSend.write("*2*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 13] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 289), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 541), (255, 255, 255), tolerance=5):
                 # SAVE 10:30 AS AN OPTIOn
                 MessageToSend.write("*3*" + " - @ 9:45" + "\n")
                 df.iloc[row, 14] = "1"
             else:
                 MessageToSend.write("*3*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 14] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 321), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 574), (255, 255, 255), tolerance=5):
                 # SAVE 11:30 AS AN OPTION
                 MessageToSend.write("*4*" + " - @ 10:30" + "\n")
                 df.iloc[row, 15] = "1"
@@ -902,7 +902,7 @@ def find_available_date():
             else:
                 MessageToSend.write("*4*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 15] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 353), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 607), (255, 255, 255), tolerance=5):
                 # SAVE 13:30 AS AN OPTION
                 MessageToSend.write("*5*" + " - @ 11:15" + "\n")
                 df.iloc[row, 16] = "1"
@@ -910,7 +910,7 @@ def find_available_date():
             else:
                 MessageToSend.write("*5*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 16] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 430), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 680), (255, 255, 255), tolerance=5):
                 # SAVE 14:30 AS AN OPTION
                 MessageToSend.write("*6*" + " - @ 13:00" + "\n")
                 df.iloc[row, 17] = "1"
@@ -918,7 +918,7 @@ def find_available_date():
             else:
                 MessageToSend.write("*6*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 17] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 462), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 713), (255, 255, 255), tolerance=5):
                 # SAVE 15:30 AS AN OPTION
                 MessageToSend.write("*7*" + " - @ 13:45" + "\n")
                 df.iloc[row, 18] = "1"
@@ -926,7 +926,7 @@ def find_available_date():
             else:
                 MessageToSend.write("*7*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 18] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 494), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 740), (255, 255, 255), tolerance=5):
                 # SAVE 14:30 AS AN OPTION
                 MessageToSend.write("*8*" + " - @ 14:30" + "\n")
                 df.iloc[row, 19] = "1"
@@ -934,7 +934,7 @@ def find_available_date():
             else:
                 MessageToSend.write("*8*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 19] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 526), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 779), (255, 255, 255), tolerance=5):
                 # SAVE 15:30 AS AN OPTION
                 MessageToSend.write("*9*" + " - @ 15:15" + "\n")
                 df.iloc[row, 20] = "1"
@@ -942,7 +942,7 @@ def find_available_date():
             else:
                 MessageToSend.write("*9*" + " - _Booked Out_" + "\n")
                 df.iloc[row, 20] = "0"
-            if pt.pixelMatchesColor(int(x + 100), int(y + 558), (255, 255, 255), tolerance=5):
+            if pt.pixelMatchesColor(int(x + 400), int(y + 812), (255, 255, 255), tolerance=5):
                 # SAVE 15:30 AS AN OPTION
                 MessageToSend.write("*10*" + " - @ 16:00" + "\n")
                 df.iloc[row, 21] = "1"
@@ -976,18 +976,7 @@ def check_selection(selected):
     global df
     global row
 
-    Calendar_Tab, Error = Look_For_GC("Calendar_Tab.png")
-    if Error:
-        return
-    else:
-        pt.moveTo(Calendar_Tab)
-        sleep(0.5)
-        pt.click()
-        sleep(1)
-        pt.moveRel(0, 300)
-        sleep(0.5)
-        pt.scroll(-400)
-        sleep(0.5)
+    To_GC()
 
     opt_date_obj = datetime.strptime(str(df.iloc[row, 22]), '%Y-%m-%d')
     now_date_obj = datetime.strptime(str(datetime.now().date()), '%Y-%m-%d')
@@ -1029,9 +1018,14 @@ def check_selection(selected):
         sleep(1)
         n = n + 1
 
+    # Scroll Up
+    pt.moveRel(0, 300)
+    sleep(2)
+    pt.scroll(400)
+    sleep(2)
+
     if selected == 1:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 270), (255, 255, 255), tolerance=5):
-            print('SENT')
+        if pt.pixelMatchesColor(int(x + 400), int(y + 475), (255, 255, 255), tolerance=5):
             BookingPrep('8:15')
         else:
             To_WA()
@@ -1039,7 +1033,7 @@ def check_selection(selected):
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 2:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 294), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 508), (255, 255, 255), tolerance=5):
             BookingPrep('9:00')
         else:
             To_WA()
@@ -1047,7 +1041,7 @@ def check_selection(selected):
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 3:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 318), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 541), (255, 255, 255), tolerance=5):
             BookingPrep('9:45')
         else:
             To_WA()
@@ -1055,14 +1049,14 @@ def check_selection(selected):
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 4:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 342), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 574), (255, 255, 255), tolerance=5):
             BookingPrep('10:30')
         else:
             send_message('S_No_longer_Ava.txt')
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 5:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 390), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 607), (255, 255, 255), tolerance=5):
             BookingPrep('11:15')
         else:
             To_WA()
@@ -1070,7 +1064,7 @@ def check_selection(selected):
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 6:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 414), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 680), (255, 255, 255), tolerance=5):
             BookingPrep('13:00')
         else:
             To_WA()
@@ -1078,7 +1072,7 @@ def check_selection(selected):
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 7:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 438), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 713), (255, 255, 255), tolerance=5):
             BookingPrep('13:45')
         else:
             To_WA()
@@ -1086,7 +1080,7 @@ def check_selection(selected):
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 8:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 438), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 740), (255, 255, 255), tolerance=5):
             BookingPrep('14:30')
         else:
             To_WA()
@@ -1094,7 +1088,7 @@ def check_selection(selected):
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 9:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 438), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 779), (255, 255, 255), tolerance=5):
             BookingPrep('15:15')
         else:
             To_WA()
@@ -1102,7 +1096,7 @@ def check_selection(selected):
             df.iloc[row, 8] = "1"
             find_available_date()
     elif selected == 10:
-        if pt.pixelMatchesColor(int(x + 100), int(y + 438), (255, 255, 255), tolerance=5):
+        if pt.pixelMatchesColor(int(x + 400), int(y + 812), (255, 255, 255), tolerance=5):
             BookingPrep('16:00')
         else:
             To_WA()
@@ -1126,7 +1120,7 @@ def BookingPrep(Time):
     else:
         x = Today[0]
         y = Today[1]
-        pt.moveTo(x, y + 154)
+        pt.moveTo(x, y + 425)
         sleep(0.5)
         pt.click()
         sleep(1)
@@ -1154,9 +1148,9 @@ def BookingPrep(Time):
         sleep(1)
         pyperclip.copy(Time)
         pt.hotkey('ctrl', 'v')
-        sleep(0.5)
+        sleep(1)
         pt.hotkey('enter')
-        sleep(0.5)
+        sleep(1)
 
     save, Error = Look_For_GC("save.png")
     if Error:
