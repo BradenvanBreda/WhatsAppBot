@@ -35,7 +35,7 @@ def get_phone_num():
     Mag_dots = pt.locateCenterOnScreen("mag_dots.png", confidence=.7)
     x = Mag_dots[0]
     y = Mag_dots[1]
-    pt.moveTo(x - 200, y + 10)
+    pt.moveTo(x - 200, y)
     sleep(0.5)
     pt.click()
     sleep(2)
@@ -88,7 +88,7 @@ def Initiate_NL(phone_num):
     global df
     global row
     New_row = {"Cell": str(phone_num),
-               "Attempts": "0",
+               "Free": "0",
                "Consent": "0",
                "Ticket": "0",
                "Folder": "0",
@@ -184,20 +184,22 @@ def store_and_ask():
                                 dt_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d').date()
                                 today = datetime.now().date()
                                 Days_ago = (today - dt_obj).days
-                                if Days_ago <= 14:
+                                if Days_ago <= 15:
                                     send_message('D_MessageToSend.txt')
                                 else:
                                     send_message("S_GXPU_Pos_Time_Exclusion.txt")
+                                    send_message("S_Result_Delay.txt")
                                     send_message('I_Restart.txt')
                                     df.iloc[row, 24] = "2"
                             elif str(df.iloc[row, 9]) == '3':  # GXPU Neg
                                 dt_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d').date()
                                 today = datetime.now().date()
                                 Days_ago = (today - dt_obj).days
-                                if Days_ago <= 3:
+                                if Days_ago <= 4:
                                     send_message('D_MessageToSend.txt')
                                 else:
                                     send_message("S_GXPU_Neg_Time_Exclusion.txt")
+                                    send_message("S_Result_Delay.txt")
                                     send_message('I_Restart.txt')
                                     df.iloc[row, 24] = "2"
                             else:  # str(df.iloc[row, 9]) == 4: pending
@@ -207,9 +209,12 @@ def store_and_ask():
                             send_message('I_Restart.txt')
                             df.iloc[row, 24] = "2"
                     else:  # errors messages and register resets are dealt with in TC_INFO
+                        #print('error')
                         pass
                 else:
-                    incorrect_answer('S_Used_FolNum.txt')
+                    send_message('S_Used_FolNum.txt')
+                    send_message('I_Restart.txt')
+                    df.iloc[row, 24] = "2"
             else:
                 send_message('S_Invalid_Fol_Num.txt')
                 send_message('I_Restart.txt')
@@ -220,7 +225,9 @@ def store_and_ask():
                 find_available_date()
             elif new_message == "2" or new_message == "2 " or new_message == "no" or new_message == "nee" or new_message == "hayi":
                 df.iloc[row, 10] = "2"
-                incorrect_answer('S_Incorrect_FolNum.txt')
+                send_message('S_Incorrect_FolNum.txt')
+                send_message('I_Restart.txt')
+                df.iloc[row, 24] = "2"
             else:
                 send_message('I_Error_1_2_only.txt')
         elif str(df.iloc[row, 23]) == "0":
@@ -263,7 +270,7 @@ def zero_reg():
     global df
     global row
     i = 24
-    while i > 1: #does not zero attempts and makes channel open
+    while i > 0: #does not zero cell
         df.iloc[row, i] = "0"
         i = i - 1
     df.iloc[row, 11] = "1" #offset set to 1
@@ -345,7 +352,7 @@ def ask_for_ticket():
     sleep(0.5)
     pt.doubleClick()
     sleep(2)
-    Add_Caption = pt.locateOnScreen("caption.png", confidence=.7)
+    Add_Caption = pt.locateOnScreen("Caption.png", confidence=.7)
     pt.moveTo(Add_Caption)
     sleep(0.5)
     pt.click()
@@ -373,28 +380,13 @@ def ask_for_folder_num():
     sleep(0.5)
     pt.doubleClick()
     sleep(2)
-    Caption = pt.locateOnScreen("caption.png", confidence=.7)
+    Caption = pt.locateOnScreen("Caption.png", confidence=.7)
     pt.moveTo(Caption)
     sleep(0.5)
     pt.click()
     sleep(0.5)
     pt.hotkey('ctrl', 'v')
     pt.typewrite("\n", interval=0.01)
-    return
-
-def incorrect_answer(reason):
-    global df
-    global row
-    df.iloc[row, 1] = str(int(df.iloc[row, 1]) + 1)
-    if str(df.iloc[row, 1]) == "3":
-        df.iloc[row, 24] = "3"
-        send_message(reason)
-        send_message('S_Blocked.txt')
-        df.to_csv("D_Patient_Log.txt", index=False)
-    else:
-        send_message(reason)
-        send_message('I_Restart.txt')
-        df.iloc[row, 24] = "2"
     return
 
 def TC_Info(Fol_Num_Str):
@@ -509,6 +501,19 @@ def TC_Info(Fol_Num_Str):
     # Valid Folder Number Check and Collect personal detail
     TC_DropDown, Error = Look_For("TC_DropDown.png")
     if Error:
+        To_WA()
+        send_message("S_Invalid_Fol_Num.txt")
+        send_message('S_Result_Delay.txt')
+        send_message('I_Restart.txt')
+        df.iloc[row, 24] = "2"
+        MessageToSend = open("D_MessageToSend.txt", "w")
+        MessageToSend.write("Invalid Folder Number Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
+                            + "Cell#:" + str(df.iloc[row, 0]))
+        MessageToSend.close()
+        send_message_to('D_MessageToSend.txt', "+27 82 075 8484", "WA_WorkNum.png")
+        send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
+        To_TC()
+        TC_Logout()
         return True
     else:
         #valid
@@ -520,10 +525,11 @@ def TC_Info(Fol_Num_Str):
         return True
     else:
         pt.moveTo(TC_DOB[0], TC_DOB[1]+40)
-        sleep(0.5)
+        sleep(2)
         pt.tripleClick()
-        sleep(0.5)
+        sleep(2)
         pt.hotkey('ctrl', 'c')
+        sleep(1)
         DOB = pyperclip.paste()
         if '/' in DOB:
             DOBSplit = DOB.split('/')
@@ -583,6 +589,19 @@ def TC_Info(Fol_Num_Str):
     # GXPU been conducted?
     TC_GXPU, Error = Look_For("TC_GXPU.png")
     if Error:
+        To_WA()
+        send_message("S_No_GXPU.txt")
+        send_message('S_Result_Delay.txt')
+        send_message('I_Restart.txt')
+        df.iloc[row, 24] = "2"
+        MessageToSend = open("D_MessageToSend.txt", "w")
+        MessageToSend.write("No GXPU Test Registered Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
+                            + "Cell#:" + str(df.iloc[row, 0]))
+        MessageToSend.close()
+        send_message_to('D_MessageToSend.txt', "+27 82 075 8484", "WA_WorkNum.png")
+        send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
+        To_TC()
+        TC_Logout()
         return True
     else:
         #valid
@@ -696,26 +715,18 @@ def Look_For(Image):
             break
         if i > 30:
             Error = True
-            To_WA()
-            MessageToSend = open("D_MessageToSend.txt", "w")
-            if Image == "TC_DropDown.png":
-                incorrect_answer("S_Invalid_Fol_Num.txt")
-                MessageToSend.write("Invalid Folder Number Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                    + "Cell#:" + str(df.iloc[row, 0]))
-            elif Image == "TC_GXPU.png":
-                incorrect_answer("S_No_GXPU.txt")
-                MessageToSend.write("No GXPU Test Registered Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                    + "Cell#:" + str(df.iloc[row, 0]))
-            else:
+            if Image != "TC_DropDown.png" and Image != "TC_GXPU.png":
+                To_WA()
                 send_message("S_System_Down.txt")
                 send_message('I_Restart.txt')
                 df.iloc[row, 24] = "2"
+                MessageToSend = open("D_MessageToSend.txt", "w")
                 MessageToSend.write("URGENT TrakCare Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                                 + "Cell#:" + str(df.iloc[row, 0]))
-            MessageToSend.close()
-            send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
-            To_TC()
-            TC_Logout()
+                MessageToSend.close()
+                send_message_to('D_MessageToSend.txt', "+27 72 895 9231", "WA_BvBNum.png")
+                To_TC()
+                TC_Logout()
             break
         i = i + 1
         sleep(0.5)
@@ -756,7 +767,7 @@ def Look_For_GC(Image):
     i = 0
     Error = False
     while True:
-        Temp = pt.locateCenterOnScreen(Image, confidence=.9)
+        Temp = pt.locateCenterOnScreen(Image, confidence=.8)
         if Temp is not None:
             break
         if i > 50:
@@ -801,8 +812,8 @@ def find_available_date():
 
     To_GC()
 
-    PosTraceRange = 14
-    NegWaitRange = 3
+    PosTraceRange = 15
+    NegWaitRange = 4
     test_date_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d')
     now_date_obj = datetime.strptime(str(datetime.now().date()), '%Y-%m-%d')
     now_test_diff = int((now_date_obj - test_date_obj).days)
@@ -984,7 +995,9 @@ def check_selection(selected):
 
     match = FolderNum_Match(str(df.iloc[row, 4]))
     if match:
-        incorrect_answer('S_Used_FolNum.txt')
+        send_message('S_Used_FolNum.txt')
+        send_message('I_Restart.txt')
+        df.iloc[row, 24] = "2"
         return
 
     if int(opt_now_diff) <= 0:
@@ -1194,7 +1207,7 @@ def send_map():
     sleep(0.5)
     pt.doubleClick()
     sleep(2)
-    Add_Caption = pt.locateOnScreen("caption.png", confidence=.7)
+    Add_Caption = pt.locateOnScreen("Caption.png", confidence=.7)
     pt.moveTo(Add_Caption)
     sleep(0.5)
     pt.click()

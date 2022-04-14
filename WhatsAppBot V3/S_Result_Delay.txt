@@ -1,0 +1,8 @@
+﻿_English_
+TB test information can take up to a day to show up on the national system. So if you did have a TB test today then please ignore the previous error message and RESTART the screening process tomorrow when the system is guaranteed to show your TB test information.
+
+_Xhosa_
+Ulwazi lovavanyo lwe-TB lunokuthatha ukuya kutsho kusuku ukubonakala kwinkqubo yesizwe. Ke ukuba uye wavavanya i-TB namhlanje nceda ungawuhoyi umyalezo wemposiso yangaphambili kwaye uqale ngokutsha inkqubo yokuhlola ngomso xa inkqubo iqinisekisiwe ukubonisa iziphumo zakho zovavanyo lwe-TB.
+
+_Afrikaans_
+TB-toetsinligting kan tot 'n dag neem om op die nasionale stelsel te verskyn. So as jy vandag 'n TB-toets gehad het ignoreer asseblief die vorige boodskap en RESTART die siftingsproses môre wanneer die stelsel gewaarborg is om jou TB-toetsinligting te wys.
