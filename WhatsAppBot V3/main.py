@@ -87,27 +87,49 @@ def get_phone_num():
 def Initiate_NL(phone_num):
     global df
     global row
-    New_row = {"Cell": str(phone_num),
-               "Free": "0",
-               "Consent": "0",
-               "Ticket": "0",
-               "Folder": "0",
-               "BirthDate": "0",
-               "Name": "0",
-               "Surname": "0",
-               "TestDate": "0",
-               "Status": "0",
-               "Confirmed": "0",
-               "Offset": "1",
-               "8:15": "0", "9:00": "0", "9:45": "0", "10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0",
-               "14:30": "0", "15:15": "0", "16:00": "0",
-               "OptionDate": "0",
-               "AppointTime": "0",
-               "Outcome": "0"}
-    df = df.append(New_row, ignore_index=True)
-    row = len(df) - 1
-    send_message('I_Introduction.txt')
-    send_message('Q_Consent.txt')
+    if str(phone_num) == "+27 72 895 9231" or str(phone_num) == "+27 62 576 0514" or str(phone_num) == "+27 79 257 2808" or str(phone_num) == "+27 61 980 2534" or str(phone_num) == "+27 84 407 7686" or str(phone_num) == "+27 78 396 9801" or str(phone_num) == "+27 79 382 2050" or str(phone_num) == "+27 71 167 4134":
+        New_row = {"Cell": str(phone_num),
+                   "Recruiter": "1",
+                   "Consent": "1",
+                   "Ticket": "1",
+                   "Folder": "0",
+                   "BirthDate": "0",
+                   "Name": "0",
+                   "Surname": "0",
+                   "TestDate": "0",
+                   "Status": "0",
+                   "Confirmed": "0",
+                   "Offset": "1",
+                   "8:15": "0", "9:00": "0", "9:45": "0", "10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0",
+                   "14:30": "0", "15:15": "0", "16:00": "0",
+                   "OptionDate": "0",
+                   "AppointTime": "0",
+                   "Outcome": "0"}
+        df = df.append(New_row, ignore_index=True)
+        row = len(df) - 1
+        send_message('Q_Folder_Number.txt')
+    else:
+        New_row = {"Cell": str(phone_num),
+                   "Recruiter": "0",
+                   "Consent": "0",
+                   "Ticket": "0",
+                   "Folder": "0",
+                   "BirthDate": "0",
+                   "Name": "0",
+                   "Surname": "0",
+                   "TestDate": "0",
+                   "Status": "0",
+                   "Confirmed": "0",
+                   "Offset": "1",
+                   "8:15": "0", "9:00": "0", "9:45": "0", "10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0",
+                   "14:30": "0", "15:15": "0", "16:00": "0",
+                   "OptionDate": "0",
+                   "AppointTime": "0",
+                   "Outcome": "0"}
+        df = df.append(New_row, ignore_index=True)
+        row = len(df) - 1
+        send_message('I_Introduction.txt')
+        send_message('Q_Consent.txt')
     df.to_csv("D_Patient_Log.txt", index=False)
 
 def store_and_ask():
@@ -127,8 +149,11 @@ def store_and_ask():
             send_message('S_Stop.txt')
             send_message('I_Restart.txt')
         elif new_message == "restart": #jump straight to open
-            send_message('I_Introduction.txt')
-            send_message('Q_Consent.txt')
+            if str(df.iloc[row, 1]) == "1":
+                ask_for_folder_num()
+            else:
+                send_message('I_Introduction.txt')
+                send_message('Q_Consent.txt')
             zero_reg()
         elif str(df.iloc[row, 2]) == "0": #Consent?
             if new_message == "1" or new_message == "1 " or new_message == "yes" or new_message == "ja" or new_message == "ewe":
@@ -254,8 +279,11 @@ def store_and_ask():
             send_message('I_Restart.txt')
     elif str(df.iloc[row, 24]) == "2":  # Closed and Unsuccessful
         if new_message == "restart" or new_message == "restart." or new_message == "restart ":
-            send_message('I_Introduction.txt')
-            send_message('Q_Consent.txt')
+            if str(df.iloc[row, 1]) == "1":
+                ask_for_folder_num()
+            else:
+                send_message('I_Introduction.txt')
+                send_message('Q_Consent.txt')
             zero_reg()
         else:
             send_message('I_Restart.txt')
@@ -270,10 +298,19 @@ def zero_reg():
     global df
     global row
     i = 24
-    while i > 0: #does not zero cell
-        df.iloc[row, i] = "0"
-        i = i - 1
-    df.iloc[row, 11] = "1" #offset set to 1
+    if str(df.iloc[row, 1]) == "1":  # its a recuiter
+        while i > 0:  # does not zero cell
+            df.iloc[row, i] = "0"
+            i = i - 1
+        df.iloc[row, 1] = "1"
+        df.iloc[row, 2] = "1"
+        df.iloc[row, 3] = "1"
+        df.iloc[row, 11] = "1"
+    else:
+        while i > 0:  # does not zero cell
+            df.iloc[row, i] = "0"
+            i = i - 1
+        df.iloc[row, 11] = "1" #offset set to 1
     df.to_csv("D_Patient_Log.txt", index=False)
     return
 
@@ -362,31 +399,34 @@ def ask_for_ticket():
     return
 
 def ask_for_folder_num():
-    txt = open('Q_Folder_Number.txt', 'r', encoding='utf-8-sig')
-    temp = txt.read()
-    txt.close()
-    pyperclip.copy(temp)
-    paperclip = pt.locateCenterOnScreen("paperclip.png", confidence=.8)
-    pt.moveTo(paperclip)
-    sleep(0.5)
-    pt.click()
-    sleep(1)
-    pt.moveRel(0, -70)
-    sleep(0.5)
-    pt.click()
-    sleep(3)
-    Folder_Number = pt.locateCenterOnScreen("Folder_Number.png", confidence=.7)
-    pt.moveTo(Folder_Number)
-    sleep(0.5)
-    pt.doubleClick()
-    sleep(2)
-    Caption = pt.locateOnScreen("Caption.png", confidence=.7)
-    pt.moveTo(Caption)
-    sleep(0.5)
-    pt.click()
-    sleep(0.5)
-    pt.hotkey('ctrl', 'v')
-    pt.typewrite("\n", interval=0.01)
+    if str(df.iloc[row, 1]) == "1":
+        send_message('Q_Folder_Number.txt')
+    else:
+        txt = open('Q_Folder_Number.txt', 'r', encoding='utf-8-sig')
+        temp = txt.read()
+        txt.close()
+        pyperclip.copy(temp)
+        paperclip = pt.locateCenterOnScreen("paperclip.png", confidence=.8)
+        pt.moveTo(paperclip)
+        sleep(0.5)
+        pt.click()
+        sleep(1)
+        pt.moveRel(0, -70)
+        sleep(0.5)
+        pt.click()
+        sleep(3)
+        Folder_Number = pt.locateCenterOnScreen("Folder_Number.png", confidence=.7)
+        pt.moveTo(Folder_Number)
+        sleep(0.5)
+        pt.doubleClick()
+        sleep(2)
+        Caption = pt.locateOnScreen("Caption.png", confidence=.7)
+        pt.moveTo(Caption)
+        sleep(0.5)
+        pt.click()
+        sleep(0.5)
+        pt.hotkey('ctrl', 'v')
+        pt.typewrite("\n", interval=0.01)
     return
 
 def TC_Info(Fol_Num_Str):
@@ -1189,31 +1229,34 @@ def BookingPrep(Time):
     return
 
 def send_map():
-    txt = open('I_Directions.txt', 'r', encoding='utf-8-sig')
-    temp = txt.read()
-    txt.close()
-    pyperclip.copy(temp)
-    paperclip = pt.locateCenterOnScreen("paperclip.png", confidence=.8)
-    pt.moveTo(paperclip)
-    sleep(0.5)
-    pt.click()
-    sleep(1)
-    pt.moveRel(0, -70)
-    sleep(0.5)
-    pt.click()
-    sleep(3)
-    Ticket_Example = pt.locateCenterOnScreen("map.png", confidence=.7)
-    pt.moveTo(Ticket_Example)
-    sleep(0.5)
-    pt.doubleClick()
-    sleep(2)
-    Add_Caption = pt.locateOnScreen("Caption.png", confidence=.7)
-    pt.moveTo(Add_Caption)
-    sleep(0.5)
-    pt.click()
-    sleep(0.5)
-    pt.hotkey('ctrl', 'v')
-    pt.typewrite("\n", interval=0.01)
+    if str(df.iloc[row, 1]) == "1":
+        return
+    else:
+        txt = open('I_Directions.txt', 'r', encoding='utf-8-sig')
+        temp = txt.read()
+        txt.close()
+        pyperclip.copy(temp)
+        paperclip = pt.locateCenterOnScreen("paperclip.png", confidence=.8)
+        pt.moveTo(paperclip)
+        sleep(0.5)
+        pt.click()
+        sleep(1)
+        pt.moveRel(0, -70)
+        sleep(0.5)
+        pt.click()
+        sleep(3)
+        Ticket_Example = pt.locateCenterOnScreen("map.png", confidence=.7)
+        pt.moveTo(Ticket_Example)
+        sleep(0.5)
+        pt.doubleClick()
+        sleep(2)
+        Add_Caption = pt.locateOnScreen("Caption.png", confidence=.7)
+        pt.moveTo(Add_Caption)
+        sleep(0.5)
+        pt.click()
+        sleep(0.5)
+        pt.hotkey('ctrl', 'v')
+        pt.typewrite("\n", interval=0.01)
     return
 
 def FolderNum_Match(Folder_num):
