@@ -97,8 +97,8 @@ def Initiate_NL(phone_num):
                "Status": "0",
                "Confirmed": "0",
                "Offset": "1",
-               "8:15": "0", "9:00": "0", "9:45": "0", "10:30": "0", "11:15": "0", "13:00": "0", "13:45": "0",
-               "14:30": "0", "15:15": "0", "16:00": "0",
+               "8:20": "0", "8:40": "0", "9:00": "0", "9:20": "0", "9:40": "0", "10:00": "0", "10:20": "0", "10:40": "0", "11:00": "0", "11:20": "0", "11:40": "0",
+               "13:00": "0", "13:20": "0", "13:40": "0", "14:00": "0", "14:20": "0", "14:40": "0", "15:00": "0", "15:20": "0", "15:40": "0", "16:00": "0", "16:20": "0",
                "OptionDate": "0",
                "AppointTime": "0",
                "Outcome": "0"}
@@ -117,7 +117,7 @@ def store_and_ask():
     if new_message == "pause system":
         send_message('S_System_Paused.txt')
         sleep(100)
-    elif str(df.iloc[row, 24]) == "0":
+    elif str(df.iloc[row, 36]) == "0":
         if new_message == "":
             send_message('S_Message_Del.txt')
         elif new_message == "stop":
@@ -164,7 +164,7 @@ def store_and_ask():
                                     send_message("S_GXPU_Pos_Time_Exclusion.txt")
                                     send_message("S_Result_Delay.txt")
                                     send_message('I_Restart.txt')
-                                    df.iloc[row, 24] = "2"
+                                    df.iloc[row, 36] = "2"
                             elif str(df.iloc[row, 9]) == '3':  # GXPU Neg
                                 dt_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d').date()
                                 today = datetime.now().date()
@@ -175,24 +175,24 @@ def store_and_ask():
                                     send_message("S_GXPU_Neg_Time_Exclusion.txt")
                                     send_message("S_Result_Delay.txt")
                                     send_message('I_Restart.txt')
-                                    df.iloc[row, 24] = "2"
+                                    df.iloc[row, 36] = "2"
                             else:  # str(df.iloc[row, 9]) == 4: pending
                                 send_message('D_MessageToSend.txt')
                         else:
                             send_message("S_Too_Young.txt")
                             send_message('I_Restart.txt')
-                            df.iloc[row, 24] = "2"
+                            df.iloc[row, 36] = "2"
                     else:  # errors messages and register resets are dealt with in TC_INFO
                         #print('error')
                         pass
                 else:
                     send_message('S_Used_FolNum.txt')
                     send_message('I_Restart.txt')
-                    df.iloc[row, 24] = "2"
+                    df.iloc[row, 36] = "2"
             else:
                 send_message('S_Invalid_Fol_Num.txt')
                 send_message('I_Restart.txt')
-                df.iloc[row, 24] = "2"
+                df.iloc[row, 36] = "2"
         elif str(df.iloc[row, 10]) == "0": #Personal detail correct??
             if new_message == "1" or new_message == "1 " or new_message == "yes" or new_message == "ja" or new_message == "ewe":
                 df.iloc[row, 10] = "1"
@@ -201,38 +201,38 @@ def store_and_ask():
                 df.iloc[row, 10] = "2"
                 send_message('S_Incorrect_FolNum.txt')
                 send_message('I_Restart.txt')
-                df.iloc[row, 24] = "2"
+                df.iloc[row, 36] = "2"
             else:
                 send_message('I_Error_1_2_only.txt')
-        elif str(df.iloc[row, 23]) == "0":
+        elif str(df.iloc[row, 35]) == "0":
             if new_message == "0" or new_message == "0 ":
                 df.iloc[row, 11] = str(int(str(df.iloc[row, 11])) + 1)
                 find_available_date()
-            elif new_message == "11" or new_message == "11 ":
+            elif new_message == "23" or new_message == "23 ":
                 df.iloc[row, 11] = "1"
                 find_available_date()
-            elif new_message == "12" or new_message == "12 ":
+            elif new_message == "24" or new_message == "24 ":
                 send_message('S_Cancel_Options.txt')
                 if str(df.iloc[row, 9]) == "4":
                     send_message('S_Waiting_Restart.txt')
-                    df.iloc[row, 24] = "2"
+                    df.iloc[row, 36] = "2"
             elif new_message.isnumeric():
                 selected = int(new_message)
                 check_selection(selected)
             else:
                 send_message('I_Error_Num_only.txt')
-    elif str(df.iloc[row, 24]) == "1":  # Closed Successfully
+    elif str(df.iloc[row, 36]) == "1":  # Closed Successfully
         if new_message == "restart" or new_message == "restart." or new_message == "restart ":
             Initiate_NL(str(df.iloc[row, 0])) #send current phone number
         else:
             send_message('I_Restart.txt')
-    elif str(df.iloc[row, 24]) == "2":  # Closed and Unsuccessful
+    elif str(df.iloc[row, 36]) == "2":  # Closed and Unsuccessful
         if new_message == "restart" or new_message == "restart." or new_message == "restart ":
             send_message('Q_Folder_Number.txt')
             zero_reg()
         else:
             send_message('I_Restart.txt')
-    elif str(df.iloc[row, 24]) == "3":  # Closed and Blocked
+    elif str(df.iloc[row, 36]) == "3":  # Closed and Blocked
         send_message('S_Blocked.txt')
     else:
         print("no If Statement entered")
@@ -242,7 +242,7 @@ def store_and_ask():
 def zero_reg():
     global df
     global row
-    i = 24
+    i = 36
     while i > 0:  # does not zero cell
         df.iloc[row, i] = "0"
         i = i - 1
@@ -396,7 +396,7 @@ def TC_Info(Fol_Num_Str):
         send_message("S_Invalid_Fol_Num.txt")
         send_message('S_Result_Delay.txt')
         send_message('I_Restart.txt')
-        df.iloc[row, 24] = "2"
+        df.iloc[row, 36] = "2"
         MessageToSend = open("D_MessageToSend.txt", "w")
         MessageToSend.write("Invalid Folder Number Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                             + "Cell#:" + str(df.iloc[row, 0]))
@@ -427,7 +427,7 @@ def TC_Info(Fol_Num_Str):
         else:
             To_WA()
             send_message("S_Details_Error.txt")
-            df.iloc[row, 24] = "2"
+            df.iloc[row, 36] = "2"
             MessageToSend = open("D_MessageToSend.txt", "w")
             MessageToSend.write("No Date of Birth Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                                 + "Cell#:" + str(df.iloc[row, 0]))
@@ -480,7 +480,7 @@ def TC_Info(Fol_Num_Str):
         send_message("S_No_GXPU.txt")
         send_message('S_Result_Delay.txt')
         send_message('I_Restart.txt')
-        df.iloc[row, 24] = "2"
+        df.iloc[row, 36] = "2"
         MessageToSend = open("D_MessageToSend.txt", "w")
         MessageToSend.write("No GXPU Test Registered Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                             + "Cell#:" + str(df.iloc[row, 0]))
@@ -539,7 +539,7 @@ def GetTestDate():
             Error = True
             To_WA()
             send_message("S_Details_Error.txt")
-            df.iloc[row, 24] = "2"
+            df.iloc[row, 36] = "2"
             MessageToSend = open("D_MessageToSend.txt", "w")
             MessageToSend.write("Test Date Unavailable Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                                 + "Cell#:" + str(df.iloc[row, 0]))
@@ -572,7 +572,7 @@ def GetStatus():
         if i > 20:
             To_WA()
             send_message("S_Details_Error.txt")
-            df.iloc[row, 24] = "2"
+            df.iloc[row, 36] = "2"
             MessageToSend = open("D_MessageToSend.txt", "w")
             MessageToSend.write("GXPU Result Undefined Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                                 + "Cell#:" + str(df.iloc[row, 0]))
@@ -600,7 +600,7 @@ def Look_For(Image):
                 To_WA()
                 send_message("S_System_Down.txt")
                 send_message('I_Restart.txt')
-                df.iloc[row, 24] = "2"
+                df.iloc[row, 36] = "2"
                 MessageToSend = open("D_MessageToSend.txt", "w")
                 MessageToSend.write("URGENT TrakCare Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
                                 + "Cell#:" + str(df.iloc[row, 0]))
@@ -654,7 +654,7 @@ def Look_For_GC(Image):
             To_WA()
             send_message("S_System_Down.txt")
             send_message('I_Restart.txt')
-            df.iloc[row, 24] = "2"
+            df.iloc[row, 36] = "2"
             MessageToSend = open("D_MessageToSend.txt", "w")
             MessageToSend.write("Google Calender Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n" + "Cell#:" + str(df.iloc[row, 0]))
             MessageToSend.close()
@@ -707,7 +707,7 @@ def find_available_date():
     if none_limit < 1:
         To_WA()
         send_message('S_None_Available.txt')
-        df.iloc[row, 24] = "2"
+        df.iloc[row, 36] = "2"
         # if they were waiting for the results encourage restart if postive
         if str(df.iloc[row, 9]) == "4":
             To_WA()
@@ -761,87 +761,40 @@ def find_available_date():
             sleep(1.5)
             pt.scroll(400)
             sleep(1.5)
-            if pt.pixelMatchesColor(int(x + 400), int(y + 475), (255, 255, 255), tolerance=5):
-                MessageToSend.write("*1*" + " - @ 8:15" + "\n")
-                df.iloc[row, 12] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*1*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 12] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 508), (255, 255, 255), tolerance=5):
-                # SAVE 9:30 AS AN OPTION
-                MessageToSend.write("*2*" + " - @ 9:00" + "\n")
-                df.iloc[row, 13] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*2*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 13] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 541), (255, 255, 255), tolerance=5):
-                # SAVE 10:30 AS AN OPTIOn
-                MessageToSend.write("*3*" + " - @ 9:45" + "\n")
-                df.iloc[row, 14] = "1"
-            else:
-                MessageToSend.write("*3*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 14] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 574), (255, 255, 255), tolerance=5):
-                # SAVE 11:30 AS AN OPTION
-                MessageToSend.write("*4*" + " - @ 10:30" + "\n")
-                df.iloc[row, 15] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*4*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 15] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 607), (255, 255, 255), tolerance=5):
-                # SAVE 13:30 AS AN OPTION
-                MessageToSend.write("*5*" + " - @ 11:15" + "\n")
-                df.iloc[row, 16] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*5*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 16] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 680), (255, 255, 255), tolerance=5):
-                # SAVE 14:30 AS AN OPTION
-                MessageToSend.write("*6*" + " - @ 13:00" + "\n")
-                df.iloc[row, 17] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*6*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 17] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 713), (255, 255, 255), tolerance=5):
-                # SAVE 15:30 AS AN OPTION
-                MessageToSend.write("*7*" + " - @ 13:45" + "\n")
-                df.iloc[row, 18] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*7*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 18] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 740), (255, 255, 255), tolerance=5):
-                # SAVE 14:30 AS AN OPTION
-                MessageToSend.write("*8*" + " - @ 14:30" + "\n")
-                df.iloc[row, 19] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*8*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 19] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 779), (255, 255, 255), tolerance=5):
-                # SAVE 15:30 AS AN OPTION
-                MessageToSend.write("*9*" + " - @ 15:15" + "\n")
-                df.iloc[row, 20] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*9*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 20] = "0"
-            if pt.pixelMatchesColor(int(x + 400), int(y + 812), (255, 255, 255), tolerance=5):
-                # SAVE 15:30 AS AN OPTION
-                MessageToSend.write("*10*" + " - @ 16:00" + "\n")
-                df.iloc[row, 21] = "1"
-                OptionAvialable = "1"
-            else:
-                MessageToSend.write("*10*" + " - _Booked Out_" + "\n")
-                df.iloc[row, 21] = "0"
 
-            MessageToSend.write("*11*" + " - _Restart Options_" + "\n")
-            MessageToSend.write("*12*" + " - _Cancel Appointment_" + "\n")
+            #morning session
+            M_B_Time = ["8:20", "8:40", "9:00", "9:20", "9:40", "10:00", "10:20", "10:40", "11:00", "11:20", "11:40"]
+
+            i = 0
+            space_size = 14.5
+            while (i < 11):
+                if pt.pixelMatchesColor(int(x+500), int(y+471 + i*space_size), (255, 255, 255), tolerance=5):
+                    MessageToSend.write("*" + str(i+1) + "*" + " - @ " + M_B_Time[i] + "\n")
+                    df.iloc[row, i+12] = "1"
+                    OptionAvialable = "1"
+                else:
+                    MessageToSend.write("*" + str(i+1) + "*" + " - _Booked Out_" + "\n")
+                    df.iloc[row, i+12] = "0"
+                i = i + 1
+
+            #Afternoon session
+            A_B_Time = ["13:00", "13:20", "13:40", "14:00", "14:20", "14:40", "15:00", "15:20", "15:40", "16:00",
+                        "16:20"]
+            i = 0
+            space_size = 14.5
+            while (i < 11):
+                if pt.pixelMatchesColor(int(x+500), int(y+673 + i*space_size), (255, 255, 255), tolerance=5):
+                    MessageToSend.write("*" + str(i+12) + "*" + " - @ " + A_B_Time[i] + "\n")
+                    df.iloc[row, i+23] = "1"
+                    OptionAvialable = "1"
+                else:
+                    MessageToSend.write("*" + str(i+12) + "*" + " - _Booked Out_" + "\n")
+                    df.iloc[row, i+22] = "0"
+                i = i + 1
+
+
+            MessageToSend.write("*23*" + " - _Restart Options_" + "\n")
+            MessageToSend.write("*24*" + " - _Cancel Appointment_" + "\n")
             MessageToSend.close()
 
             if OptionAvialable == "0":
@@ -852,11 +805,11 @@ def find_available_date():
                 To_WA()
                 send_message('D_MessageToSend.txt')
                 #OPtion date
-                df.iloc[row, 22] = str(option_date_obj.date())
+                df.iloc[row, 34] = str(option_date_obj.date())
                 return
     To_WA()
     send_message('S_None_Available.txt')
-    df.iloc[row, 24] = "2"
+    df.iloc[row, 36] = "2"
     if str(df.iloc[row, 9]) == "4":
         send_message('S_Waiting_Restart.txt')
     return
@@ -867,7 +820,7 @@ def check_selection(selected):
 
     To_GC()
 
-    opt_date_obj = datetime.strptime(str(df.iloc[row, 22]), '%Y-%m-%d')
+    opt_date_obj = datetime.strptime(str(df.iloc[row, 34]), '%Y-%m-%d')
     now_date_obj = datetime.strptime(str(datetime.now().date()), '%Y-%m-%d')
     opt_now_diff = int((opt_date_obj - now_date_obj).days)
 
@@ -875,7 +828,7 @@ def check_selection(selected):
     if match:
         send_message('S_Used_FolNum.txt')
         send_message('I_Restart.txt')
-        df.iloc[row, 24] = "2"
+        df.iloc[row, 36] = "2"
         return
 
     if int(opt_now_diff) <= 0:
@@ -915,86 +868,39 @@ def check_selection(selected):
     pt.scroll(400)
     sleep(1.5)
 
-    if selected == 1:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 475), (255, 255, 255), tolerance=5):
-            BookingPrep('8:15')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 2:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 508), (255, 255, 255), tolerance=5):
-            BookingPrep('9:00')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 3:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 541), (255, 255, 255), tolerance=5):
-            BookingPrep('9:45')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 4:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 574), (255, 255, 255), tolerance=5):
-            BookingPrep('10:30')
-        else:
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 5:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 607), (255, 255, 255), tolerance=5):
-            BookingPrep('11:15')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 6:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 680), (255, 255, 255), tolerance=5):
-            BookingPrep('13:00')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 7:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 713), (255, 255, 255), tolerance=5):
-            BookingPrep('13:45')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 8:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 740), (255, 255, 255), tolerance=5):
-            BookingPrep('14:30')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 9:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 779), (255, 255, 255), tolerance=5):
-            BookingPrep('15:15')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    elif selected == 10:
-        if pt.pixelMatchesColor(int(x + 400), int(y + 812), (255, 255, 255), tolerance=5):
-            BookingPrep('16:00')
-        else:
-            To_WA()
-            send_message('S_No_longer_Ava.txt')
-            df.iloc[row, 11] = "1"
-            find_available_date()
-    else:
+    # morning session
+    M_B_Time = ["8:20", "8:40", "9:00", "9:20", "9:40", "10:00", "10:20", "10:40", "11:00", "11:20", "11:40"]
+
+    i = 0
+    space_size = 14.5
+    while (i < 11):
+        if selected == i+1:
+            if pt.pixelMatchesColor(int(x + 500), int(y + 471 + i * space_size), (255, 255, 255), tolerance=5):
+                BookingPrep(M_B_Time[i])
+            else:
+                To_WA()
+                send_message('S_No_longer_Ava.txt')
+                df.iloc[row, 11] = "1"
+                find_available_date()
+        i = i + 1
+
+    # Afternoon session
+    A_B_Time = ["13:00", "13:20", "13:40", "14:00", "14:20", "14:40", "15:00", "15:20", "15:40", "16:00",
+                "16:20"]
+    i = 0
+    space_size = 14.5
+    while (i < 11):
+        if selected == i + 12:
+            if pt.pixelMatchesColor(int(x + 500), int(y + 673 + i * space_size), (255, 255, 255), tolerance=5):
+                BookingPrep(A_B_Time[i])
+            else:
+                To_WA()
+                send_message('S_No_longer_Ava.txt')
+                df.iloc[row, 11] = "1"
+                find_available_date()
+        i = i + 1
+
+    if selected > 24:
         To_WA()
         send_message('S_Not_Option.txt')
         df.iloc[row, 11] = "1"
@@ -1057,13 +963,13 @@ def BookingPrep(Time):
     temp = txt.read()
     txt.close()
     MessageToSend = open("D_MessageToSend.txt", "w")
-    MessageToSend.write(str(temp) + "\n" + "\n" + "Date: *" + str(df.iloc[row, 22]) + "*" + "\n" + "Time: " + Time)
+    MessageToSend.write(str(temp) + "\n" + "\n" + "Date: *" + str(df.iloc[row, 34]) + "*" + "\n" + "Time: " + Time)
     MessageToSend.close()
     send_message('D_MessageToSend.txt')
-    df.iloc[row, 24] = "1"
-    df.iloc[row, 23] = Time
-    send_map()
+    df.iloc[row, 36] = "1"
+    df.iloc[row, 35] = Time
     send_message('I_Ticket_Warning.txt')
+    send_map()
     return
 
 def send_map():
@@ -1090,7 +996,7 @@ def FolderNum_Match(Folder_num):
     i = len(df)
     match = False
     while i > 0:  # Find matching numbers
-        if str(df.iloc[i - 1, 4]) == str(Folder_num) and str(df.iloc[i - 1, 24]) == '1':
+        if str(df.iloc[i - 1, 4]) == str(Folder_num) and str(df.iloc[i - 1, 36]) == '1':
             match = True
             break  # only latest of interest, save time
         i = i - 1

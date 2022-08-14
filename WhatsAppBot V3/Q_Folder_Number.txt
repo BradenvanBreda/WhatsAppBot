@@ -1,8 +1,8 @@
 ﻿_English_
-What is the "Folder Number" on your ticket?
+What is your "Folder Number"?
 
 _Xhosa_
-Ithini ye-“Folder Number” kwitikiti lakho?
+Ithini i"Folder Number" yakho?
 
 _Afrikaans_
-Wat is die "Folder Number" op u kaartjie?
+Wat is jou "Folder Number"?
