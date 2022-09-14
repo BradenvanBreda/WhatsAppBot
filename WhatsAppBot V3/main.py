@@ -311,7 +311,7 @@ def TC_Info(Fol_Num_Str):
             sleep(0.5)
             pt.click()
             sleep(0.5)
-            pyperclip.copy('123America#NHLS')
+            pyperclip.copy('123America#NHLS2')
             pt.hotkey('ctrl', 'v')
             sleep(1)
             pt.click()
@@ -428,10 +428,6 @@ def TC_Info(Fol_Num_Str):
             To_WA()
             send_message("S_Details_Error.txt")
             df.iloc[row, 36] = "2"
-            MessageToSend = open("D_MessageToSend.txt", "w")
-            MessageToSend.write("No Date of Birth Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                + "Cell#:" + str(df.iloc[row, 0]))
-            MessageToSend.close()
             To_TC()
             TC_Logout()
             return True
@@ -540,10 +536,6 @@ def GetTestDate():
             To_WA()
             send_message("S_Details_Error.txt")
             df.iloc[row, 36] = "2"
-            MessageToSend = open("D_MessageToSend.txt", "w")
-            MessageToSend.write("Test Date Unavailable Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                + "Cell#:" + str(df.iloc[row, 0]))
-            MessageToSend.close()
             To_TC()
             TC_Logout()
             break
@@ -573,10 +565,6 @@ def GetStatus():
             To_WA()
             send_message("S_Details_Error.txt")
             df.iloc[row, 36] = "2"
-            MessageToSend = open("D_MessageToSend.txt", "w")
-            MessageToSend.write("GXPU Result Undefined Error" + "\n" + "Folder#: " + str(df.iloc[row, 4]) + "\n"
-                                + "Cell#:" + str(df.iloc[row, 0]))
-            MessageToSend.close()
             To_TC()
             TC_Logout()
             Error = True
@@ -969,7 +957,7 @@ def BookingPrep(Time):
     df.iloc[row, 36] = "1"
     df.iloc[row, 35] = Time
     send_message('I_Ticket_Warning.txt')
-    send_map()
+    #send_map()
     return
 
 def send_map():
@@ -981,7 +969,7 @@ def send_map():
     pt.moveRel(0, -70)
     sleep(0.5)
     pt.click()
-    sleep(3)
+    sleep(5)
     Ticket_Example = pt.locateCenterOnScreen("map.png", confidence=.7)
     pt.moveTo(Ticket_Example)
     sleep(0.5)
