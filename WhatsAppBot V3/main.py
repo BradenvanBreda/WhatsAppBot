@@ -311,7 +311,7 @@ def TC_Info(Fol_Num_Str):
             sleep(0.5)
             pt.click()
             sleep(0.5)
-            pyperclip.copy('123America#NHLS2')
+            pyperclip.copy('123America#NHLS3')
             pt.hotkey('ctrl', 'v')
             sleep(1)
             pt.click()
@@ -912,6 +912,7 @@ def BookingPrep(Time):
 
     GC_Add_Title, Error = Look_For_GC("GC_Add_Title.png")
     if Error:
+        print('nf')
         return
     else:
         pt.moveTo(GC_Add_Title)
