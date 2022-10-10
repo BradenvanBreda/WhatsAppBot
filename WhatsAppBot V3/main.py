@@ -678,8 +678,8 @@ def find_available_date():
 
     To_GC()
 
-    PosTraceRange = 15
-    NegWaitRange = 4
+    PosTraceRange = 10
+    NegWaitRange = 3
     test_date_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d')
     now_date_obj = datetime.strptime(str(datetime.now().date()), '%Y-%m-%d')
     now_test_diff = int((now_date_obj - test_date_obj).days)
