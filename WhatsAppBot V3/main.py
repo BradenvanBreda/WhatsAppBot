@@ -311,7 +311,7 @@ def TC_Info(Fol_Num_Str):
             sleep(0.5)
             pt.click()
             sleep(0.5)
-            pyperclip.copy('123America#NHLS3')
+            pyperclip.copy('123America#NHLS4')
             pt.hotkey('ctrl', 'v')
             sleep(1)
             pt.click()
@@ -579,7 +579,7 @@ def Look_For(Image):
     i = 0
     Error = False
     while True:
-        Temp = pt.locateCenterOnScreen(Image, confidence=.8)
+        Temp = pt.locateCenterOnScreen(Image, confidence=.7)
         if Temp is not None:
             break
         if i > 5:
@@ -679,7 +679,10 @@ def find_available_date():
     To_GC()
 
     PosTraceRange = 10
-    NegWaitRange = 3
+    if str(df.iloc[row, 0]) == "+27 62 396 5214" or str(df.iloc[row, 0]) == "+27 79 382 2050" or str(df.iloc[row, 0]) == "+27 71 167 4134":
+        NegWaitRange = 4
+    else:
+        NegWaitRange = 0
     test_date_obj = datetime.strptime(str(df.iloc[row, 8]), '%Y-%m-%d')
     now_date_obj = datetime.strptime(str(datetime.now().date()), '%Y-%m-%d')
     now_test_diff = int((now_date_obj - test_date_obj).days)
